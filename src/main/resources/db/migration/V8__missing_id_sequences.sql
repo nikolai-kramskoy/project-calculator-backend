@@ -1,0 +1,2 @@
+CREATE SEQUENCE IF NOT EXISTS rate_id_sequence AS BIGINT;
+CREATE SEQUENCE IF NOT EXISTS team_member_id_sequence AS BIGINT;

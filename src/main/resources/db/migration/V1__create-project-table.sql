@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS project (
+    id BIGINT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description VARCHAR(1000) NOT NULL,
+    client VARCHAR(100) NOT NULL,
+    created_by VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    last_updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE SEQUENCE IF NOT EXISTS project_id_sequence AS BIGINT;

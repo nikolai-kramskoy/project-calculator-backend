@@ -1,0 +1,46 @@
+services:
+  project-calculator:
+    container_name: project-calculator
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      # I know about secrets, maybe in the future I will be using them
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      CLIENT_URL: ${CLIENT_URL}
+    networks:
+      - project-calculator-network
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -O - http://localhost:8080/actuator/health > /dev/null 2>&1"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+      start_period: 10s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    container_name: postgres
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - project-calculator-network
+    healthcheck:
+      test: [ "CMD", "pg_isready", "--dbname=${POSTGRES_DB}", "--username=${POSTGRES_USER}" ]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+      start_period: 3s
+
+networks:
+  project-calculator-network:

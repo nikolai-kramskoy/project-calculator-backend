@@ -4,6 +4,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,12 +28,10 @@ public class WebSecurityConfiguration {
                 authorize
                     // Swagger and actuator aren't under authentication or authorization
                     .mvcMatchers(
-                        // swagger
                         "/v3/api-docs/**",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
 
-                        // actuator
                         "/actuator/**")
                     .permitAll()
 
@@ -49,7 +48,8 @@ public class WebSecurityConfiguration {
                     .authenticated())
         .httpBasic(withDefaults())
 
-        // CORS
+        // Check if any CORS config is added if there is no
+        // corsConfigurationSource bean
         .cors(withDefaults())
 
         // CSRF probably shouldn't be turned off
@@ -65,8 +65,10 @@ public class WebSecurityConfiguration {
   }
 
   @Bean
+  // Must be fine for checking if CLIENT_URL env var is set
+  @ConditionalOnProperty(name = "client.url")
   public CorsConfigurationSource corsConfigurationSource(
-      @Value("${client-url}") final String clientUrl) {
+      @Value("${CLIENT_URL}") final String clientUrl) {
     final var configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(Collections.singletonList(clientUrl));
     configuration.setAllowedMethods(Collections.singletonList("*"));

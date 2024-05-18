@@ -11,18 +11,29 @@ Estimates are recomputed when any of the project components change and are
 stored in the database, so this mechanism avoids time-consuming computations
 of estimates for all projects with each GET request.
 
+## Usage
+
+```shell
+docker compose up
+```
+
 ## Installation
 
-This server uses single PostgreSQL instance.
+This server is dependent on single PostgreSQL instance.
 
 ### Environment variables
 
 You need to set several env variables:
-- `PG_HOST` - by default this server uses `project-calculator-dev` database
-- `PG_PORT`
-- `PG_USER`
-- `PG_PASSWORD`
-- `CLIENT_URL` - this is used for CORS
+- `POSTGRES_HOST`
+- `POSTGRES_PORT`
+- `POSTGRES_DB`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `CLIENT_URL` - if this variable is set, then it is used for CORS
+
+### Java options
+
+You can set 
 
 ### CLI arguments
 

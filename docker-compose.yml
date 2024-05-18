@@ -12,6 +12,8 @@ services:
       # I know about secrets, maybe in the future I will be using them
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       CLIENT_URL: ${CLIENT_URL}
+      JDK_JAVA_OPTIONS: ${JDK_JAVA_OPTIONS}
+      CLI_ARGS: ${CLI_ARGS}
     networks:
       - project-calculator-network
     ports:

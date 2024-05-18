@@ -13,27 +13,36 @@ of estimates for all projects with each GET request.
 
 ## Usage
 
-```shell
-docker compose up
-```
-
-## Installation
-
-This server is dependent on single PostgreSQL instance.
+This server is dependent only on single PostgreSQL instance.
 
 ### Environment variables
 
-You need to set several env variables:
+You need to set several environment variables:
 - `POSTGRES_HOST`
 - `POSTGRES_PORT`
 - `POSTGRES_DB`
 - `POSTGRES_USER`
 - `POSTGRES_PASSWORD`
+
+You may optionally set this environment variables:
 - `CLIENT_URL` - if this variable is set, then it is used for CORS
+- `JDK_JAVA_OPTIONS`
+- `CLI_ARGS`
 
-### Java options
+You can create `.env` file in this directory and place there all the 
+needed environment variables so docker compose will automatically read
+them and inject in the containers.
 
-You can set 
+### Launch
+
+In this case you're having `.env` file can simply run this command (otherwise
+you also can use `-e` option with `docker compose`):
+
+```shell
+docker compose up
+```
+
+You also can use `mvn` directly to compile and package it without docker.
 
 ### CLI arguments
 

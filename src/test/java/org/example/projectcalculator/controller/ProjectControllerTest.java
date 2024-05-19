@@ -33,7 +33,7 @@ import org.example.projectcalculator.service.ProjectService;
 @WebMvcTest(ProjectController.class)
 @ComponentScan(basePackageClasses = ProjectMapper.class)
 @WithMockUser
-public class ProjectControllerTest {
+class ProjectControllerTest {
 
   private static final String PROJECT_API_URL = "/projects";
 
@@ -47,20 +47,15 @@ public class ProjectControllerTest {
   private ProjectService projectServiceMock;
 
   @Test
-  public void testCreateProject_validProject_returnProjectDto() throws Exception {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
+  void testCreateProject_validProject_returnProjectDto() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
     final var createProjectDtoRequest = projectMapper.toCreateProjectDtoRequest(project);
     final var expectedProjectDto = projectMapper.toProjectDto(project);
 
-    when(projectServiceMock.saveProject(eq(createProjectDtoRequest))).thenReturn(
-        expectedProjectDto);
+    when(projectServiceMock.saveProject(createProjectDtoRequest)).thenReturn(expectedProjectDto);
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 post(PROJECT_API_URL)
@@ -70,8 +65,6 @@ public class ProjectControllerTest {
                     .content(JsonConverter.objectToJson(createProjectDtoRequest)))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
     Assertions.assertEquals(200, response.getStatus());
 
@@ -80,14 +73,10 @@ public class ProjectControllerTest {
   }
 
   @Test
-  public void testCreateProject_invalidProject_returnErrorDtoResponse() throws Exception {
-    // Arrange
-
+  void testCreateProject_invalidProject_returnErrorDtoResponse() throws Exception {
     final var invalidCreateProjectDtoRequest = new CreateUpdateProjectDtoRequest(null, null, null);
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 post(PROJECT_API_URL)
@@ -97,13 +86,13 @@ public class ProjectControllerTest {
                     .content(JsonConverter.objectToJson(invalidCreateProjectDtoRequest)))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
+
     Assertions.assertEquals(400, response.getStatus());
 
     final var errorDtoResponse =
         JsonConverter.jsonToObject(response.getContentAsString(), ErrorDtoResponse.class);
+
     // Must be 3 validation errors
     Assertions.assertEquals(3, errorDtoResponse.errors().size());
 
@@ -111,6 +100,7 @@ public class ProjectControllerTest {
     final String notBlankErrorMessage = "must not be blank";
 
     final var errors = errorDtoResponse.errors();
+
     assertValidationError(errors, "title", notBlankErrorCode, notBlankErrorMessage);
     assertValidationError(errors, "description", notBlankErrorCode, notBlankErrorMessage);
     assertValidationError(errors, "client", notBlankErrorCode, notBlankErrorMessage);

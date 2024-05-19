@@ -33,7 +33,7 @@ import org.example.projectcalculator.service.RateService;
 @WebMvcTest(RateController.class)
 @ComponentScan(basePackageClasses = RateMapper.class)
 @WithMockUser
-public class RateControllerTest {
+class RateControllerTest {
 
   private static final String PROJECT_API_URL = "/projects/1/rates/1";
 
@@ -46,11 +46,10 @@ public class RateControllerTest {
   @MockBean
   private RateService rateService;
 
-
   @Test
-  public void testUpdateSuccessful() throws Exception {
-    final Project project = createProject(null);
-    final Rate rate = new Rate(
+  void testUpdateSuccessful() throws Exception {
+    final var project = createProject(null);
+    final var rate = new Rate(
         5,
         Position.ARCHITECT,
         new BigDecimal(31),
@@ -58,17 +57,17 @@ public class RateControllerTest {
     final var updateRateDtoRequest = new UpdateRateDtoRequest(rate.getRublesPerHour());
     final var expectedRateDto = rateMapper.toRateDto(rate);
 
-    when(rateService.updateRate(eq(updateRateDtoRequest), eq(project.getId()),
-        eq(rate.getId()))).thenReturn(expectedRateDto);
+    when(rateService.updateRate(updateRateDtoRequest, project.getId(), rate.getId())).thenReturn(expectedRateDto);
 
-    final MvcResult result = mockMvc.perform(put(PROJECT_API_URL)
+    final var result = mockMvc.perform(put(PROJECT_API_URL)
             .with(csrf())
             .characterEncoding(StandardCharsets.UTF_8)
             .contentType(MediaType.APPLICATION_JSON)
             .content(JsonConverter.objectToJson(updateRateDtoRequest)))
         .andReturn();
 
-    final RateDto rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), RateDto.class);
+    final var rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), RateDto.class);
+
     assertAll(
         () -> assertEquals(200, result.getResponse().getStatus()),
         () -> assertTrue(rateDto.id() > 0),
@@ -78,9 +77,9 @@ public class RateControllerTest {
   }
 
   @Test
-  public void testUpdateSuccessful2() throws Exception {
-    final Project project = createProject(null);
-    final Rate rate = new Rate(
+  void testUpdateSuccessful2() throws Exception {
+    final var project = createProject(null);
+    final var rate = new Rate(
         3,
         Position.REGULAR_DEVELOPER,
         new BigDecimal(23),
@@ -89,17 +88,17 @@ public class RateControllerTest {
     final var updateRateDtoRequest = new UpdateRateDtoRequest(rate.getRublesPerHour());
     final var expectedRateDto = rateMapper.toRateDto(rate);
 
-    when(rateService.updateRate(eq(updateRateDtoRequest), eq(project.getId()),
-        eq(rate.getId()))).thenReturn(expectedRateDto);
+    when(rateService.updateRate(updateRateDtoRequest, project.getId(), rate.getId())).thenReturn(expectedRateDto);
 
-    final MvcResult result = mockMvc.perform(put(PROJECT_API_URL)
+    final var result = mockMvc.perform(put(PROJECT_API_URL)
             .with(csrf())
             .characterEncoding(StandardCharsets.UTF_8)
             .contentType(MediaType.APPLICATION_JSON)
             .content(JsonConverter.objectToJson(updateRateDtoRequest)))
         .andReturn();
 
-    final RateDto rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), RateDto.class);
+    final var rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), RateDto.class);
+
     assertAll(
         () -> assertEquals(200, result.getResponse().getStatus()),
         () -> assertTrue(rateDto.id() > 0),
@@ -109,9 +108,10 @@ public class RateControllerTest {
   }
 
   @Test
-  public void testFailureUpdate1() throws Exception {
+  void testFailureUpdate1() throws Exception {
     final var failureRequest = new UpdateRateDtoRequest(null);
-    final String badPath = "/projects";
+    final var badPath = "/projects";
+
     mockMvc
         .perform(
             put(badPath)
@@ -123,9 +123,10 @@ public class RateControllerTest {
   }
 
   @Test
-  public void testFailureUpdate2() throws Exception {
+  void testFailureUpdate2() throws Exception {
     final var goodRequest = new UpdateRateDtoRequest(new BigDecimal(12));
-    final String badPath = "/projectz/22/ratez/123";
+    final var badPath = "/projectz/22/ratez/123";
+
     mockMvc
         .perform(
             put(badPath)
@@ -136,11 +137,11 @@ public class RateControllerTest {
         .andExpect(status().isNotFound());
   }
 
-
   @Test
-  public void testBadRequestFailureUpdate() throws Exception {
+  void testBadRequestFailureUpdate() throws Exception {
     final var badRequest = new UpdateRateDtoRequest(null);
-    final String goodPath = "/projects/22/rates/123";
+    final var goodPath = "/projects/22/rates/123";
+
     mockMvc
         .perform(
             put(goodPath)

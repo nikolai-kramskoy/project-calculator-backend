@@ -43,7 +43,7 @@ import org.example.projectcalculator.service.FeatureService;
 @WebMvcTest(FeatureController.class)
 @ComponentScan(basePackageClasses = FeatureMapper.class)
 @WithMockUser
-public class FeatureControllerTest {
+class FeatureControllerTest {
 
   private static final String FEATURE_API_URL = "/projects/{projectId}/features";
   private static final String SPECIFIC_FEATURE_API_URL = FEATURE_API_URL + "/{featureId}";
@@ -58,22 +58,17 @@ public class FeatureControllerTest {
   private FeatureService featureServiceMock;
 
   @Test
-  public void testCreateFeatureWithMilestone_validFeature_returnFeatureDto() throws Exception {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
-    final Milestone milestone = createMilestone1(project);
-    final Feature feature = createFeature1(project, milestone);
+  void testCreateFeatureWithMilestone_validFeature_returnFeatureDto() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var milestone = createMilestone1(project);
+    final var feature = createFeature1(project, milestone);
     final var createFeatureDtoRequest = featureMapper.toCreateFeatureDtoRequest(feature);
     final var expectedFeatureDto = featureMapper.toFeatureDto(feature);
 
-    when(featureServiceMock.saveFeature(eq(createFeatureDtoRequest), eq(project.getId())))
-        .thenReturn(expectedFeatureDto);
+    when(featureServiceMock.saveFeature(createFeatureDtoRequest, project.getId())).thenReturn(expectedFeatureDto);
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 post(FEATURE_API_URL, project.getId())
@@ -83,19 +78,17 @@ public class FeatureControllerTest {
                     .content(JsonConverter.objectToJson(createFeatureDtoRequest)))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
+
     Assertions.assertEquals(200, response.getStatus());
 
     final var actualFeatureDto = JsonConverter.jsonToObject(response.getContentAsString(), FeatureDto.class);
+
     assertFeaturesAreEqual(expectedFeatureDto, actualFeatureDto);
   }
 
   @Test
-  public void testCreateFeature_invalidProjectId_returnErrorDtoResponse() throws Exception {
-    // Arrange
-
+  void testCreateFeature_invalidProjectId_returnErrorDtoResponse() throws Exception {
     final var createFeatureDtoRequest =
         new CreateFeatureDtoRequest(
             "Basic API",
@@ -105,9 +98,7 @@ public class FeatureControllerTest {
             new BigDecimal(8),
             null);
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 post(FEATURE_API_URL, 0L)
@@ -117,24 +108,23 @@ public class FeatureControllerTest {
                     .content(JsonConverter.objectToJson(createFeatureDtoRequest)))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
+
     Assertions.assertEquals(400, response.getStatus());
 
     final var errorDtoResponse =
         JsonConverter.jsonToObject(response.getContentAsString(), ErrorDtoResponse.class);
+
     // Must be 1 validation error
     Assertions.assertEquals(1, errorDtoResponse.errors().size());
 
     final var errors = errorDtoResponse.errors();
+
     assertValidationError(errors, "projectId", "Min", "must be greater than or equal to 1");
   }
 
   @Test
-  public void testCreateFeature_invalidEstimates1_returnErrorDtoResponse() throws Exception {
-    // Arrange
-
+  void testCreateFeature_invalidEstimates1_returnErrorDtoResponse() throws Exception {
     final var createFeatureDtoRequest =
         new CreateFeatureDtoRequest(
             "Basic API",
@@ -145,15 +135,11 @@ public class FeatureControllerTest {
             new BigDecimal(10),
             null);
 
-    // Act, assert
-
     assertFeatureEstimatesValidationFail(createFeatureDtoRequest);
   }
 
   @Test
-  public void testCreateFeature_invalidEstimates2_returnErrorDtoResponse() throws Exception {
-    // Arrange
-
+  void testCreateFeature_invalidEstimates2_returnErrorDtoResponse() throws Exception {
     final var createFeatureDtoRequest =
         new CreateFeatureDtoRequest(
             "Basic API",
@@ -164,30 +150,22 @@ public class FeatureControllerTest {
             new BigDecimal(5),
             null);
 
-    // Act, assert
-
     assertFeatureEstimatesValidationFail(createFeatureDtoRequest);
   }
 
   @Test
-  public void testUpdateFeature_validFeature_returnFeatureDto() throws Exception {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
-    final Feature feature = createFeature1(project, null);
-    final Feature updatedFeature = createUpdatedFeature(feature);
+  void testUpdateFeature_validFeature_returnFeatureDto() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var feature = createFeature1(project, null);
+    final var updatedFeature = createUpdatedFeature(feature);
     final var updateFeatureDtoRequest = featureMapper.toUpdateFeatureDtoRequest(updatedFeature,
         null);
     final var expectedFeatureDto = featureMapper.toFeatureDto(updatedFeature);
 
-    when(featureServiceMock.updateFeature(
-        eq(updateFeatureDtoRequest), eq(project.getId()), eq(feature.getId())))
-        .thenReturn(expectedFeatureDto);
+    when(featureServiceMock.updateFeature(updateFeatureDtoRequest, project.getId(), feature.getId())).thenReturn(expectedFeatureDto);
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 put(SPECIFIC_FEATURE_API_URL, project.getId(), feature.getId())
@@ -197,36 +175,30 @@ public class FeatureControllerTest {
                     .content(JsonConverter.objectToJson(updateFeatureDtoRequest)))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
+
     Assertions.assertEquals(200, response.getStatus());
 
     final var actualFeatureDto = JsonConverter.jsonToObject(response.getContentAsString(), FeatureDto.class);
+
     assertFeaturesAreEqual(expectedFeatureDto, actualFeatureDto);
   }
 
   @Test
-  public void testUpdateFeatureUpdateMilestone_validFeature_returnFeatureDto() throws Exception {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
-    final Milestone oldMilestone = createMilestone1(project);
-    final Milestone newMilestone = createMilestone2(project);
-    final Feature feature = createFeature1(project, oldMilestone);
-    final Feature updatedFeature = createUpdatedFeature(feature);
+  void testUpdateFeatureUpdateMilestone_validFeature_returnFeatureDto() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var oldMilestone = createMilestone1(project);
+    final var newMilestone = createMilestone2(project);
+    final var feature = createFeature1(project, oldMilestone);
+    final var updatedFeature = createUpdatedFeature(feature);
     final var updateFeatureDtoRequest = featureMapper.toUpdateFeatureDtoRequest(updatedFeature,
         newMilestone.getId());
     final var expectedFeatureDto = featureMapper.toFeatureDto(updatedFeature);
 
-    when(featureServiceMock.updateFeature(
-        eq(updateFeatureDtoRequest), eq(project.getId()), eq(feature.getId())))
-        .thenReturn(expectedFeatureDto);
+    when(featureServiceMock.updateFeature(updateFeatureDtoRequest, project.getId(), feature.getId())).thenReturn(expectedFeatureDto);
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 put(SPECIFIC_FEATURE_API_URL, project.getId(), feature.getId())
@@ -236,33 +208,28 @@ public class FeatureControllerTest {
                     .content(JsonConverter.objectToJson(updateFeatureDtoRequest)))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
+
     Assertions.assertEquals(200, response.getStatus());
 
     final var actualFeatureDto = JsonConverter.jsonToObject(response.getContentAsString(), FeatureDto.class);
+
     assertFeaturesAreEqual(expectedFeatureDto, actualFeatureDto);
   }
 
   @Test
-  public void testGetAllFeaturesWithMilestoneId_validArguments_returnList() throws Exception {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
-    final Milestone milestone = createMilestone1(project);
-    final Feature feature1 = createFeature1(project, milestone);
-    final Feature feature2 = createFeature2(project, null);
+  void testGetAllFeaturesWithMilestoneId_validArguments_returnList() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var milestone = createMilestone1(project);
+    final var feature1 = createFeature1(project, milestone);
+    final var feature2 = createFeature2(project, null);
     final var expectedFeatureDtos = List.of(featureMapper.toFeatureDto(feature1),
         featureMapper.toFeatureDto(feature2));
 
-    when(featureServiceMock.getAllFeatures(eq(project.getId()), eq(milestone.getId())))
-        .thenReturn(Collections.singletonList(expectedFeatureDtos.get(0)));
+    when(featureServiceMock.getAllFeatures(project.getId(), milestone.getId())).thenReturn(Collections.singletonList(expectedFeatureDtos.get(0)));
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 get(FEATURE_API_URL, project.getId())
@@ -271,33 +238,28 @@ public class FeatureControllerTest {
                     .characterEncoding(StandardCharsets.UTF_8))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
+
     Assertions.assertEquals(200, response.getStatus());
 
     final var actualFeatureDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
         FeatureDto.class);
+
     Assertions.assertEquals(1, actualFeatureDtos.size());
   }
 
   @Test
-  public void testGetAllFeaturesWithoutMilestoneId_validArguments_returnList() throws Exception {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
-    final Feature feature1 = createFeature1(project, null);
-    final Feature feature2 = createFeature2(project, null);
+  void testGetAllFeaturesWithoutMilestoneId_validArguments_returnList() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var feature1 = createFeature1(project, null);
+    final var feature2 = createFeature2(project, null);
     final var expectedFeatureDtos = List.of(featureMapper.toFeatureDto(feature1),
         featureMapper.toFeatureDto(feature2));
 
-    when(featureServiceMock.getAllFeatures(eq(project.getId()), eq(null)))
-        .thenReturn(expectedFeatureDtos);
+    when(featureServiceMock.getAllFeatures(project.getId(), null)).thenReturn(expectedFeatureDtos);
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 get(FEATURE_API_URL, project.getId())
@@ -305,21 +267,19 @@ public class FeatureControllerTest {
                     .characterEncoding(StandardCharsets.UTF_8))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
+
     Assertions.assertEquals(200, response.getStatus());
 
     final var actualFeatureDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
         FeatureDto.class);
+
     Assertions.assertEquals(2, actualFeatureDtos.size());
   }
 
   private void assertFeatureEstimatesValidationFail(
       final CreateFeatureDtoRequest createFeatureDtoRequest) throws Exception {
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 post(FEATURE_API_URL, 1L)
@@ -329,17 +289,18 @@ public class FeatureControllerTest {
                     .content(JsonConverter.objectToJson(createFeatureDtoRequest)))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
+
     Assertions.assertEquals(400, response.getStatus());
 
     final var errorDtoResponse =
         JsonConverter.jsonToObject(response.getContentAsString(), ErrorDtoResponse.class);
+
     // Must be 1 validation error
     Assertions.assertEquals(1, errorDtoResponse.errors().size());
 
     final var errors = errorDtoResponse.errors();
+
     assertValidationError(
         errors,
         "createFeatureDtoRequest",

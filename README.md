@@ -1,15 +1,26 @@
 # project-calculator-backend
 
-This backend allows clients to estimate financial and time
-(https://en.wikipedia.org/wiki/Three-point_estimation) costs of projects.
-Typical CRUD operations are available for key models. Projects are divided
-into milestones and features. Projects and milestones as a whole are estimated
-based on the estimates of each feature of the project. The client can view
-all his projects with estimates.
+This backend allows clients to estimate time and financial costs of projects.
 
-Estimates are recomputed when any of the project components change and are
-stored in the database, so this mechanism avoids time-consuming computations
-of estimates for all projects with each GET request.
+Projects are divided into milestones and features. Features may be assigned
+to a milestone of a project.
+
+Time cost for a feature is computed using three-point estimation
+(https://en.wikipedia.org/wiki/Three-point_estimation). Time costs of a
+project/milestone is sum of time costs of all features that belong to
+the project/milestone.
+
+Financial cost of a project/milestone/feature is computed based on the number
+of team members that develop the project, the rates per hour for each position
+of team member (each team member has fixed position) and the time costs of the
+project/milestone/feature.
+
+Typical CRUD operations are available for key models. User can view all his
+projects/milestones/features with estimates.
+
+Estimates are stored in the database, they're recomputed when any of the
+project components change and. This mechanism avoids time-consuming
+computations of estimates for all projects with each GET request.
 
 ## Usage
 

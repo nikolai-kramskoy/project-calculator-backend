@@ -32,7 +32,7 @@ import org.example.projectcalculator.service.UserService;
 @WebMvcTest(UserController.class)
 @ComponentScan(basePackageClasses = UserMapper.class)
 @WithMockUser
-public class UserControllerTest {
+class UserControllerTest {
 
   private static final String USER_API_URL = "/users";
 
@@ -46,18 +46,14 @@ public class UserControllerTest {
   private UserService userServiceMock;
 
   @Test
-  public void testCreateUser_validUser_returnUserDto() throws Exception {
-    // Arrange
-
-    final User user = createUser();
+  void testCreateUser_validUser_returnUserDto() throws Exception {
+    final var user = createUser();
     final var createUserDtoRequest = userMapper.toCreateUserDtoRequest(user, "qwerty123");
     final var expectedUserDto = userMapper.toUserDto(user);
 
-    when(userServiceMock.saveUser(eq(createUserDtoRequest))).thenReturn(expectedUserDto);
+    when(userServiceMock.saveUser(createUserDtoRequest)).thenReturn(expectedUserDto);
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 post(USER_API_URL)
@@ -67,24 +63,20 @@ public class UserControllerTest {
                     .content(objectToJson(createUserDtoRequest)))
             .andReturn();
 
-    // Assert
-
     final var response = mvcResult.getResponse();
+
     Assertions.assertEquals(200, response.getStatus());
 
     final var actualUserDto = jsonToObject(response.getContentAsString(), UserDto.class);
+
     assertUsersAreEqual(expectedUserDto, actualUserDto);
   }
 
   @Test
-  public void testCreateUser_invalidUser_returnErrorDtoResponse() throws Exception {
-    // Arrange
-
+  void testCreateUser_invalidUser_returnErrorDtoResponse() throws Exception {
     final var createUserDtoRequest = new CreateUserDtoRequest(null, null, null);
 
-    // Act
-
-    final MvcResult mvcResult =
+    final var mvcResult =
         mockMvc
             .perform(
                 post(USER_API_URL)
@@ -93,21 +85,21 @@ public class UserControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectToJson(createUserDtoRequest)))
             .andReturn();
-
-    // Assert
 
     final var response = mvcResult.getResponse();
     Assertions.assertEquals(400, response.getStatus());
 
     final var errorDtoResponse =
         jsonToObject(response.getContentAsString(), ErrorDtoResponse.class);
+
     // Must be 3 validation errors
     Assertions.assertEquals(3, errorDtoResponse.errors().size());
 
-    final String notBlankErrorCode = NotBlank.class.getSimpleName();
-    final String notBlankErrorMessage = "must not be blank";
+    final var notBlankErrorCode = NotBlank.class.getSimpleName();
+    final var notBlankErrorMessage = "must not be blank";
 
     final var errors = errorDtoResponse.errors();
+
     assertValidationError(errors, "login", notBlankErrorCode, notBlankErrorMessage);
     assertValidationError(errors, "password", notBlankErrorCode, notBlankErrorMessage);
     assertValidationError(errors, "email", notBlankErrorCode, notBlankErrorMessage);

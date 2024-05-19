@@ -1,6 +1,5 @@
 package org.example.projectcalculator.controller.security;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -27,8 +26,6 @@ import org.example.projectcalculator.controller.ProjectController;
 import org.example.projectcalculator.controller.UserController;
 import org.example.projectcalculator.mapper.ProjectMapper;
 import org.example.projectcalculator.mapper.UserMapper;
-import org.example.projectcalculator.model.Project;
-import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.UserRepository;
 import org.example.projectcalculator.security.WebSecurityConfiguration;
 import org.example.projectcalculator.service.ProjectService;
@@ -36,7 +33,7 @@ import org.example.projectcalculator.service.UserService;
 
 @WebMvcTest(controllers = {UserController.class, ProjectController.class})
 @ComponentScan(basePackageClasses = {WebSecurityConfiguration.class, UserMapper.class})
-public class AuthenticationTest {
+class AuthenticationTest {
 
   private static final String USER_API_URL = "/users";
   private static final String PROJECT_API_URL = "/projects";
@@ -61,33 +58,28 @@ public class AuthenticationTest {
 
   @BeforeEach
   public void setup() {
-    mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+    mockMvc = MockMvcBuilders
+        .webAppContextSetup(context)
+        .apply(springSecurity())
+        .build();
   }
 
   @Test
-  public void testPostCreateProjectEndpoint_noBasicAuth_status401() throws Exception {
-    // Arrange
-    // Act, assert
-
+  void testPostCreateProjectEndpoint_noBasicAuth_status401() throws Exception {
     mockMvc
         .perform(post(PROJECT_API_URL).with(csrf()).characterEncoding(StandardCharsets.UTF_8))
         .andExpect(status().isUnauthorized());
   }
 
   @Test
-  public void testPostCreateProjectEndpoint_validBasicCredentials_status200() throws Exception {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
+  void testPostCreateProjectEndpoint_validBasicCredentials_status200() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
     final var createProjectDtoRequest = projectMapper.toCreateProjectDtoRequest(project);
     final var expectedProjectDto = projectMapper.toProjectDto(project);
 
-    when(userRepositoryMock.findByLogin(eq(creator.getLogin()))).thenReturn(Optional.of(creator));
-    when(projectServiceMock.saveProject(eq(createProjectDtoRequest))).thenReturn(
-        expectedProjectDto);
-
-    // Act, assert
+    when(userRepositoryMock.findByLogin(creator.getLogin())).thenReturn(Optional.of(creator));
+    when(projectServiceMock.saveProject(createProjectDtoRequest)).thenReturn(expectedProjectDto);
 
     mockMvc
         .perform(
@@ -101,14 +93,10 @@ public class AuthenticationTest {
   }
 
   @Test
-  public void testPostCreateProjectEndpoint_invalidBasicCredentials_status401() throws Exception {
-    // Arrange
+  void testPostCreateProjectEndpoint_invalidBasicCredentials_status401() throws Exception {
+    final var creator = createUser();
 
-    final User creator = createUser();
-
-    when(userRepositoryMock.findByLogin(eq(creator.getLogin()))).thenReturn(Optional.of(creator));
-
-    // Act, assert
+    when(userRepositoryMock.findByLogin(creator.getLogin())).thenReturn(Optional.of(creator));
 
     mockMvc
         .perform(
@@ -120,16 +108,12 @@ public class AuthenticationTest {
   }
 
   @Test
-  public void testPostCreateUserEndpoint_noCredentials_status200() throws Exception {
-    // Arrange
-
-    final User user = createUser();
+  void testPostCreateUserEndpoint_noCredentials_status200() throws Exception {
+    final var user = createUser();
     final var createUserDtoRequest = userMapper.toCreateUserDtoRequest(user, "qwerty123");
     final var expectedUserDto = userMapper.toUserDto(user);
 
-    when(userServiceMock.saveUser(eq(createUserDtoRequest))).thenReturn(expectedUserDto);
-
-    // Act, assert
+    when(userServiceMock.saveUser(createUserDtoRequest)).thenReturn(expectedUserDto);
 
     mockMvc
         .perform(

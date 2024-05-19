@@ -12,4 +12,4 @@ COPY --from=mvn-build /project-calculator/target/project-calculator*.jar project
 EXPOSE 8080
 RUN addgroup -S project-calculator && adduser -S project-calculator -G project-calculator
 USER project-calculator
-ENTRYPOINT ["java", "-jar", "project-calculator.jar", "echo $CLI_ARGS"]
+ENTRYPOINT ["sh", "-c", "java -jar project-calculator.jar ${CLI_ARGS}"]

@@ -24,16 +24,16 @@ This server is dependent only on single PostgreSQL instance.
 
 ### Environment variables
 
-You need to set several environment variables:
+You need to set these several environment variables:
 - `POSTGRES_HOST`
 - `POSTGRES_PORT`
 - `POSTGRES_DB`
 - `POSTGRES_USER`
 - `POSTGRES_PASSWORD`
 
-You may optionally set this environment variables:
+You may optionally set these environment variables:
 - `CLIENT_URL` - if this variable is set, then it is used for CORS
-- `JDK_JAVA_OPTIONS`
+- `JDK_JAVA_OPTIONS` - example: `JDK_JAVA_OPTIONS="-ea -Ddebug"`
 - `CLI_ARGS`
 
 You can create `.env` file in this directory and place there all the 
@@ -42,22 +42,24 @@ them and inject in the containers.
 
 ### Launch
 
-In this case you're having `.env` file can simply run this command (otherwise
-you also can use `-e` option with `docker compose`):
+In the case you're having `.env` file you can simply run this command 
+(otherwise you also can use `-e` option with `docker compose`):
 
 ```shell
 docker compose up
 ```
 
-You also can use `mvn` directly to compile and package it without docker.
+You can also use `mvn` directly to compile and package it without docker,
+but then you will need to provide PostgreSQL instance yourself.
 
 ### CLI arguments
 
-You can set needed CLI arguments, for example you can set some
-properties for testing and debugging purposes to show generated SQL by
-Spring Data JPA, parameters that are used in the queries and query statistics
-(by default they are not shown):
+You can set needed CLI arguments via `CLI_ARGS` environment variable
+(e.g. `CLI_ARGS="--logging.level.org.hibernate.SQL=DEBUG --logging.level.org.hibernate.stat=DEBUG"`).
 
+These are common useful properties for testing and debugging purposes
+(e.g. to show generated SQL by Spring Data JPA, parameters that are used
+in the queries and query statistics (by default they are not shown)):
 - `logging.level.org.hibernate.SQL=DEBUG`
 - `logging.level.org.hibernate.stat=DEBUG`
 - `logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE`

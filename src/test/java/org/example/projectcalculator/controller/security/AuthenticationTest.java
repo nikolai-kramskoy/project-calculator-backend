@@ -69,16 +69,6 @@ class AuthenticationTest {
   }
 
   @Test
-  void testCreateProject_invalidCsrf_status403() throws Exception {
-    mockMvc
-        .perform(
-            post(PROJECTS_API_URL)
-                .with(csrf().useInvalidToken())
-                .characterEncoding(StandardCharsets.UTF_8))
-        .andExpect(status().isForbidden());
-  }
-
-  @Test
   void testCreateProject_validBasicCredentials_status200() throws Exception {
     final var creator = createUser();
     final var project = createProject(creator);

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/positions")
-@Tag(name = "position", description = "the positions API")
+@Tag(name = "Positions")
 @Validated
 @AllArgsConstructor
 public class PositionController {

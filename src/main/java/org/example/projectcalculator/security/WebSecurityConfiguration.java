@@ -2,7 +2,9 @@ package org.example.projectcalculator.security;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import java.util.Arrays;
 import java.util.Collections;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,7 +26,7 @@ public class WebSecurityConfiguration {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
-      @Value("${CLIENT_URL}") final String clientUrl) throws Exception {
+      @Value("${CORS_ORIGINS:#{null}}") final String corsOrigins) throws Exception {
     http = http.authorizeHttpRequests(
             authorize ->
                 authorize
@@ -47,9 +50,11 @@ public class WebSecurityConfiguration {
                     // Other requests are under authentication and authorization
                     .anyRequest()
                     .authenticated())
+        // In production CSRF protection must be on
+        .csrf(AbstractHttpConfigurer::disable)
         .httpBasic(withDefaults());
 
-    if (clientUrl != null) {
+    if (corsOrigins != null) {
       http = http.cors(withDefaults());
     }
 
@@ -62,11 +67,11 @@ public class WebSecurityConfiguration {
   }
 
   @Bean
-  @ConditionalOnProperty(name = "client.url")
+  @ConditionalOnProperty(name = "CORS_ORIGINS")
   public CorsConfigurationSource corsConfigurationSource(
-      @Value("${CLIENT_URL}") final String clientUrl) {
+      @Value("${CORS_ORIGINS}") final String corsOrigins) {
     final var configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Collections.singletonList(clientUrl));
+    configuration.setAllowedOrigins(Arrays.asList(corsOrigins.split(" ")));
     configuration.setAllowedMethods(Collections.singletonList("*"));
     configuration.setAllowedHeaders(Collections.singletonList("*"));
     configuration.setAllowCredentials(true);

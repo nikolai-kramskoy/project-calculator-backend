@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}/milestones")
-@Tag(name = "milestone", description = "the milestone API")
+@Tag(name = "Milestones")
 @Validated
 @AllArgsConstructor
 public class MilestoneController {

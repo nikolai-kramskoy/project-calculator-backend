@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}/features")
-@Tag(name = "feature", description = "the feature API")
+@Tag(name = "Features")
 @Validated
 @AllArgsConstructor
 public class FeatureController {

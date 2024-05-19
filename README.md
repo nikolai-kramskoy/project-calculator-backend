@@ -32,9 +32,11 @@ You need to set these several environment variables:
 - `POSTGRES_PASSWORD`
 
 You may optionally set these environment variables:
-- `CLIENT_URL` - if this variable is set, then it is used for CORS
-- `JDK_JAVA_OPTIONS` - example: `JDK_JAVA_OPTIONS="-ea -Ddebug"`
-- `CLI_ARGS`
+- `CORS_ORIGINS` - if this variable is set, then the values are used as CORS
+origins. Example: `CORS_ORIGINS="http://localhost:9000 https://example.com"`.
+- `JDK_JAVA_OPTIONS` - example: `JDK_JAVA_OPTIONS="-ea -Ddebug"`.
+- `CLI_ARGS` - example: 
+`CLI_ARGS="--logging.level.org.hibernate.SQL=DEBUG --logging.level.org.hibernate.stat=DEBUG"`. 
 
 You can create `.env` file in this directory and place there all the 
 needed environment variables so docker compose will automatically read
@@ -53,9 +55,6 @@ You can also use `mvn` directly to compile and package it without docker,
 but then you will need to provide PostgreSQL instance yourself.
 
 ### CLI arguments
-
-You can set needed CLI arguments via `CLI_ARGS` environment variable
-(e.g. `CLI_ARGS="--logging.level.org.hibernate.SQL=DEBUG --logging.level.org.hibernate.stat=DEBUG"`).
 
 These are common useful properties for testing and debugging purposes
 (e.g. to show generated SQL by Spring Data JPA, parameters that are used

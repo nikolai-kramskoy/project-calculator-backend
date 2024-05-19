@@ -11,7 +11,7 @@ services:
       # I know about secrets, maybe in the future I will be using them
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       # These are optional
-      CLIENT_URL:
+      CORS_ORIGINS:
       JDK_JAVA_OPTIONS:
       CLI_ARGS:
     networks:

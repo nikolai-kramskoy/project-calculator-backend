@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/users")
-@Tag(name = "user", description = "the user API")
+@Tag(name = "Users")
 @Validated
 @AllArgsConstructor
 public class UserController {

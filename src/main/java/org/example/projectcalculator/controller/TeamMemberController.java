@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/projects/{projectId}/team-members")
-@Tag(name = "team member", description = "the team member API")
+@Tag(name = "Team members")
 @Validated
 @AllArgsConstructor
 public class TeamMemberController {

@@ -4,6 +4,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,11 +49,10 @@ public class WebSecurityConfiguration {
                     .authenticated())
         .httpBasic(withDefaults())
 
-        // Check if any CORS config is added if there is no
-        // corsConfigurationSource bean
+        // TODO Check if any CORS config is added if there is no corsConfigurationSource bean
         .cors(withDefaults())
 
-        // CSRF probably shouldn't be turned off
+        // TODO CSRF probably shouldn't be turned off (change tests to support CSRF and turn it on)
         .csrf()
         .disable();
 
@@ -65,8 +65,9 @@ public class WebSecurityConfiguration {
   }
 
   @Bean
-  // Must be fine for checking if CLIENT_URL env var is set
-  @ConditionalOnProperty(name = "client.url")
+  // @ConditionalOnProperty(name = "client.url")
+  // TODO check this @ConditionalOnExpression
+  @ConditionalOnExpression("'${CLIENT_URL}'.length() > 0")
   public CorsConfigurationSource corsConfigurationSource(
       @Value("${CLIENT_URL}") final String clientUrl) {
     final var configuration = new CorsConfiguration();

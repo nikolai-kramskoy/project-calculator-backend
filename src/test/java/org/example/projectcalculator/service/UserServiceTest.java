@@ -1,9 +1,9 @@
 package org.example.projectcalculator.service;
 
-import static org.example.projectcalculator.utility.Asserter.assertUsersAreEqual;
-import static org.example.projectcalculator.utility.TestingData.CLOCK;
-import static org.example.projectcalculator.utility.TestingData.USER_MAPPER;
-import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.example.projectcalculator.Asserter.assertUsersAreEqual;
+import static org.example.projectcalculator.TestingData.CLOCK;
+import static org.example.projectcalculator.TestingData.USER_MAPPER;
+import static org.example.projectcalculator.TestingData.createUser;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

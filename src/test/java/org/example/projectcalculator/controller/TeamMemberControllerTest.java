@@ -1,10 +1,10 @@
 package org.example.projectcalculator.controller;
 
-import static org.example.projectcalculator.utility.Asserter.assertTeamMembersAreEqual;
-import static org.example.projectcalculator.utility.TestingData.TEAM_MEMBER_MAPPER;
-import static org.example.projectcalculator.utility.TestingData.createProject;
-import static org.example.projectcalculator.utility.TestingData.createTeamMember;
-import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.example.projectcalculator.Asserter.assertTeamMembersAreEqual;
+import static org.example.projectcalculator.TestingData.TEAM_MEMBER_MAPPER;
+import static org.example.projectcalculator.TestingData.createProject;
+import static org.example.projectcalculator.TestingData.createTeamMember;
+import static org.example.projectcalculator.TestingData.createUser;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;

@@ -1,4 +1,4 @@
-package org.example.projectcalculator.utility;
+package org.example.projectcalculator;
 
 import java.math.BigDecimal;
 import java.time.Clock;

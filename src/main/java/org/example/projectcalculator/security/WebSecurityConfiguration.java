@@ -47,11 +47,7 @@ public class WebSecurityConfiguration {
                     // Other requests are under authentication and authorization
                     .anyRequest()
                     .authenticated())
-        .httpBasic(withDefaults())
-
-        // TODO CSRF probably shouldn't be turned off (change tests to support CSRF and turn it on)
-        .csrf()
-        .disable();
+        .httpBasic(withDefaults());
 
     if (clientUrl != null) {
       http = http.cors(withDefaults());

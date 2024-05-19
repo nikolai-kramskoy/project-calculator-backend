@@ -1,14 +1,14 @@
 package org.example.projectcalculator.controller;
 
-import static org.example.projectcalculator.utility.Asserter.assertFeaturesAreEqual;
-import static org.example.projectcalculator.utility.Asserter.assertValidationError;
-import static org.example.projectcalculator.utility.TestingData.FEATURE_MAPPER;
-import static org.example.projectcalculator.utility.TestingData.createFeature1;
-import static org.example.projectcalculator.utility.TestingData.createFeature2;
-import static org.example.projectcalculator.utility.TestingData.createMilestone1;
-import static org.example.projectcalculator.utility.TestingData.createMilestone2;
-import static org.example.projectcalculator.utility.TestingData.createProject;
-import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.example.projectcalculator.Asserter.assertFeaturesAreEqual;
+import static org.example.projectcalculator.Asserter.assertValidationError;
+import static org.example.projectcalculator.TestingData.FEATURE_MAPPER;
+import static org.example.projectcalculator.TestingData.createFeature1;
+import static org.example.projectcalculator.TestingData.createFeature2;
+import static org.example.projectcalculator.TestingData.createMilestone1;
+import static org.example.projectcalculator.TestingData.createMilestone2;
+import static org.example.projectcalculator.TestingData.createProject;
+import static org.example.projectcalculator.TestingData.createUser;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

@@ -1,11 +1,11 @@
 package org.example.projectcalculator.controller;
 
+import static org.example.projectcalculator.Asserter.assertUsersAreEqual;
+import static org.example.projectcalculator.Asserter.assertValidationError;
+import static org.example.projectcalculator.TestingData.USER_MAPPER;
+import static org.example.projectcalculator.TestingData.createUser;
 import static org.example.projectcalculator.controller.utility.JsonConverter.jsonToObject;
 import static org.example.projectcalculator.controller.utility.JsonConverter.objectToJson;
-import static org.example.projectcalculator.utility.Asserter.assertUsersAreEqual;
-import static org.example.projectcalculator.utility.Asserter.assertValidationError;
-import static org.example.projectcalculator.utility.TestingData.USER_MAPPER;
-import static org.example.projectcalculator.utility.TestingData.createUser;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

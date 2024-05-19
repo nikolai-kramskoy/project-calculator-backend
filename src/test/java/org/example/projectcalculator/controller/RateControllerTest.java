@@ -1,23 +1,25 @@
 package org.example.projectcalculator.controller;
 
-import static org.example.projectcalculator.utility.TestingData.RATE_MAPPER;
-import static org.example.projectcalculator.utility.TestingData.createProject;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.example.projectcalculator.Asserter.assertRatesAreEqual;
+import static org.example.projectcalculator.TestingData.RATE_MAPPER;
+import static org.example.projectcalculator.TestingData.createProject;
+import static org.example.projectcalculator.TestingData.createRate;
+import static org.example.projectcalculator.TestingData.createUser;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.example.projectcalculator.controller.utility.JsonConverter;
+import org.example.projectcalculator.dto.MilestoneDto;
 import org.example.projectcalculator.dto.RateDto;
-import org.example.projectcalculator.dto.request.UpdateRateDtoRequest;
 import org.example.projectcalculator.model.Position;
 import org.example.projectcalculator.model.Rate;
 import org.example.projectcalculator.service.RateService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,7 +32,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithMockUser
 class RateControllerTest {
 
-  private static final String PROJECTS_API_URL = "/projects/1/rates/1";
+  private static final String RATES_API_URL = "/projects/{projectId}/rates";
+  private static final String SPECIFIC_RATE_API_URL = RATES_API_URL + "/{rateId}";
 
   @Autowired
   protected MockMvc mockMvc;
@@ -39,114 +42,64 @@ class RateControllerTest {
   private RateService rateServiceMock;
 
   @Test
-  void testUpdateSuccessful() throws Exception {
-    final var project = createProject(null);
-    final var rate = new Rate(
-        5,
-        Position.ARCHITECT,
-        new BigDecimal(31),
+  void testGetAllRates_validArguments_returnList() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var expectedRatesDtos =
+        List.of(
+            RATE_MAPPER.toRateDto(createRate(project)));
+
+    when(rateServiceMock.getAllRates(project.getId())).thenReturn(expectedRatesDtos);
+
+    final var mvcResult =
+        mockMvc
+            .perform(
+                get(RATES_API_URL, project.getId())
+                    .with(csrf())
+                    .characterEncoding(StandardCharsets.UTF_8))
+            .andReturn();
+
+    final var response = mvcResult.getResponse();
+
+    Assertions.assertEquals(200, response.getStatus());
+
+    final var actualMilestoneDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
+        MilestoneDto.class);
+
+    Assertions.assertEquals(1, actualMilestoneDtos.size());
+  }
+
+  @Test
+  void testUpdateMilestone_validMilestone_returnMilestoneDto() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var rate = createRate(project);
+    final var updatedRate = new Rate(rate.getId(), Position.QA_ENGINEER, new BigDecimal("3178"),
         project);
-    final var updateRateDtoRequest = new UpdateRateDtoRequest(rate.getRublesPerHour());
-    final var expectedRateDto = RATE_MAPPER.toRateDto(rate);
+    final var updateRateDtoRequest = RATE_MAPPER.toUpdateRateDtoRequest(updatedRate);
+    final var expectedRateDto = RATE_MAPPER.toRateDto(updatedRate);
 
     when(
         rateServiceMock.updateRate(updateRateDtoRequest, project.getId(), rate.getId())).thenReturn(
         expectedRateDto);
 
-    final var result = mockMvc.perform(put(PROJECTS_API_URL)
-            .with(csrf())
-            .characterEncoding(StandardCharsets.UTF_8)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(JsonConverter.objectToJson(updateRateDtoRequest)))
-        .andReturn();
+    final var mvcResult =
+        mockMvc
+            .perform(
+                put(SPECIFIC_RATE_API_URL, project.getId(), rate.getId())
+                    .with(csrf())
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(JsonConverter.objectToJson(updateRateDtoRequest)))
+            .andReturn();
 
-    final var rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
+    final var response = mvcResult.getResponse();
+
+    Assertions.assertEquals(200, response.getStatus());
+
+    final var actualRateDto = JsonConverter.jsonToObject(response.getContentAsString(),
         RateDto.class);
 
-    assertAll(
-        () -> assertEquals(200, result.getResponse().getStatus()),
-        () -> assertTrue(rateDto.id() > 0),
-        () -> assertEquals(rate.getPosition().name(), rateDto.position()),
-        () -> assertEquals(updateRateDtoRequest.rublesPerHour(), rateDto.rublesPerHour())
-    );
-  }
-
-  @Test
-  void testUpdateSuccessful2() throws Exception {
-    final var project = createProject(null);
-    final var rate = new Rate(
-        3,
-        Position.REGULAR_DEVELOPER,
-        new BigDecimal(23),
-        project);
-
-    final var updateRateDtoRequest = new UpdateRateDtoRequest(rate.getRublesPerHour());
-    final var expectedRateDto = RATE_MAPPER.toRateDto(rate);
-
-    when(
-        rateServiceMock.updateRate(updateRateDtoRequest, project.getId(), rate.getId())).thenReturn(
-        expectedRateDto);
-
-    final var result = mockMvc.perform(put(PROJECTS_API_URL)
-            .with(csrf())
-            .characterEncoding(StandardCharsets.UTF_8)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(JsonConverter.objectToJson(updateRateDtoRequest)))
-        .andReturn();
-
-    final var rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
-        RateDto.class);
-
-    assertAll(
-        () -> assertEquals(200, result.getResponse().getStatus()),
-        () -> assertTrue(rateDto.id() > 0),
-        () -> assertEquals(rate.getPosition().name(), rateDto.position()),
-        () -> assertEquals(updateRateDtoRequest.rublesPerHour(), rateDto.rublesPerHour())
-    );
-  }
-
-  @Test
-  void testFailureUpdate1() throws Exception {
-    final var failureRequest = new UpdateRateDtoRequest(null);
-    final var badPath = "/projects";
-
-    mockMvc
-        .perform(
-            put(badPath)
-                .with(csrf())
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonConverter.objectToJson(failureRequest)))
-        .andExpect(status().isNotFound());
-  }
-
-  @Test
-  void testFailureUpdate2() throws Exception {
-    final var goodRequest = new UpdateRateDtoRequest(new BigDecimal(12));
-    final var badPath = "/projectz/22/ratez/123";
-
-    mockMvc
-        .perform(
-            put(badPath)
-                .with(csrf())
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonConverter.objectToJson(goodRequest)))
-        .andExpect(status().isNotFound());
-  }
-
-  @Test
-  void testBadRequestFailureUpdate() throws Exception {
-    final var badRequest = new UpdateRateDtoRequest(null);
-    final var goodPath = "/projects/22/rates/123";
-
-    mockMvc
-        .perform(
-            put(goodPath)
-                .with(csrf())
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonConverter.objectToJson(badRequest)))
-        .andExpect(status().isBadRequest());
+    assertRatesAreEqual(expectedRateDto, actualRateDto);
   }
 }

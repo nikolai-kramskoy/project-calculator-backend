@@ -1,4 +1,4 @@
-package org.example.projectcalculator.utility;
+package org.example.projectcalculator;
 
 import java.util.List;
 import org.example.projectcalculator.dto.FeatureDto;

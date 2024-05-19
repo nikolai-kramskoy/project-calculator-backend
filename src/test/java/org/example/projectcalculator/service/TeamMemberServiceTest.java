@@ -1,11 +1,11 @@
 package org.example.projectcalculator.service;
 
+import static org.example.projectcalculator.TestingData.CLOCK;
+import static org.example.projectcalculator.TestingData.TEAM_MEMBER_MAPPER;
+import static org.example.projectcalculator.TestingData.createProject;
+import static org.example.projectcalculator.TestingData.createTeamMember;
+import static org.example.projectcalculator.TestingData.createUser;
 import static org.example.projectcalculator.service.utility.ServiceTestHelper.setSecurityContext;
-import static org.example.projectcalculator.utility.TestingData.CLOCK;
-import static org.example.projectcalculator.utility.TestingData.TEAM_MEMBER_MAPPER;
-import static org.example.projectcalculator.utility.TestingData.createProject;
-import static org.example.projectcalculator.utility.TestingData.createTeamMember;
-import static org.example.projectcalculator.utility.TestingData.createUser;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

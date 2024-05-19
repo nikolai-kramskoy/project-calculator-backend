@@ -1,13 +1,13 @@
 package org.example.projectcalculator.controller;
 
-import static org.example.projectcalculator.utility.Asserter.assertMilestonesAreEqual;
-import static org.example.projectcalculator.utility.Asserter.assertValidationError;
-import static org.example.projectcalculator.utility.TestingData.MILESTONE_MAPPER;
-import static org.example.projectcalculator.utility.TestingData.NOW;
-import static org.example.projectcalculator.utility.TestingData.createMilestone1;
-import static org.example.projectcalculator.utility.TestingData.createMilestone2;
-import static org.example.projectcalculator.utility.TestingData.createProject;
-import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.example.projectcalculator.Asserter.assertMilestonesAreEqual;
+import static org.example.projectcalculator.Asserter.assertValidationError;
+import static org.example.projectcalculator.TestingData.MILESTONE_MAPPER;
+import static org.example.projectcalculator.TestingData.NOW;
+import static org.example.projectcalculator.TestingData.createMilestone1;
+import static org.example.projectcalculator.TestingData.createMilestone2;
+import static org.example.projectcalculator.TestingData.createProject;
+import static org.example.projectcalculator.TestingData.createUser;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;

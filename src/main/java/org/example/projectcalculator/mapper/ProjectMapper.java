@@ -2,14 +2,14 @@ package org.example.projectcalculator.mapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import org.mapstruct.InjectionStrategy;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants.ComponentModel;
 import org.example.projectcalculator.dto.ProjectDto;
 import org.example.projectcalculator.dto.request.CreateUpdateProjectDtoRequest;
 import org.example.projectcalculator.model.Project;
 import org.example.projectcalculator.model.User;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants.ComponentModel;
 
 @Mapper(componentModel = ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ProjectMapper {

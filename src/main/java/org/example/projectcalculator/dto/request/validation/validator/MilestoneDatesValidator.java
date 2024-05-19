@@ -3,8 +3,8 @@ package org.example.projectcalculator.dto.request.validation.validator;
 import java.time.LocalDateTime;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import org.example.projectcalculator.dto.request.validation.annotation.MilestoneDates;
 import org.example.projectcalculator.dto.request.CreateUpdateMilestoneDtoRequest;
+import org.example.projectcalculator.dto.request.validation.annotation.MilestoneDates;
 
 public class MilestoneDatesValidator
     implements ConstraintValidator<MilestoneDates, CreateUpdateMilestoneDtoRequest> {

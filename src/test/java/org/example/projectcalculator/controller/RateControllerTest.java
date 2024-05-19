@@ -1,18 +1,23 @@
 package org.example.projectcalculator.controller;
 
+import static org.example.projectcalculator.utility.TestingData.createProject;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.example.projectcalculator.utility.TestingData.createProject;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import org.example.projectcalculator.controller.utility.JsonConverter;
+import org.example.projectcalculator.dto.RateDto;
+import org.example.projectcalculator.dto.request.UpdateRateDtoRequest;
+import org.example.projectcalculator.mapper.RateMapper;
+import org.example.projectcalculator.model.Position;
+import org.example.projectcalculator.model.Rate;
+import org.example.projectcalculator.service.RateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,14 +26,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.example.projectcalculator.dto.RateDto;
-import org.example.projectcalculator.dto.request.UpdateRateDtoRequest;
-import org.example.projectcalculator.mapper.RateMapper;
-import org.example.projectcalculator.model.Position;
-import org.example.projectcalculator.model.Project;
-import org.example.projectcalculator.model.Rate;
-import org.example.projectcalculator.service.RateService;
 
 @WebMvcTest(RateController.class)
 @ComponentScan(basePackageClasses = RateMapper.class)
@@ -57,7 +54,8 @@ class RateControllerTest {
     final var updateRateDtoRequest = new UpdateRateDtoRequest(rate.getRublesPerHour());
     final var expectedRateDto = rateMapper.toRateDto(rate);
 
-    when(rateService.updateRate(updateRateDtoRequest, project.getId(), rate.getId())).thenReturn(expectedRateDto);
+    when(rateService.updateRate(updateRateDtoRequest, project.getId(), rate.getId())).thenReturn(
+        expectedRateDto);
 
     final var result = mockMvc.perform(put(PROJECT_API_URL)
             .with(csrf())
@@ -66,7 +64,8 @@ class RateControllerTest {
             .content(JsonConverter.objectToJson(updateRateDtoRequest)))
         .andReturn();
 
-    final var rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), RateDto.class);
+    final var rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
+        RateDto.class);
 
     assertAll(
         () -> assertEquals(200, result.getResponse().getStatus()),
@@ -88,7 +87,8 @@ class RateControllerTest {
     final var updateRateDtoRequest = new UpdateRateDtoRequest(rate.getRublesPerHour());
     final var expectedRateDto = rateMapper.toRateDto(rate);
 
-    when(rateService.updateRate(updateRateDtoRequest, project.getId(), rate.getId())).thenReturn(expectedRateDto);
+    when(rateService.updateRate(updateRateDtoRequest, project.getId(), rate.getId())).thenReturn(
+        expectedRateDto);
 
     final var result = mockMvc.perform(put(PROJECT_API_URL)
             .with(csrf())
@@ -97,7 +97,8 @@ class RateControllerTest {
             .content(JsonConverter.objectToJson(updateRateDtoRequest)))
         .andReturn();
 
-    final var rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), RateDto.class);
+    final var rateDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
+        RateDto.class);
 
     assertAll(
         () -> assertEquals(200, result.getResponse().getStatus()),

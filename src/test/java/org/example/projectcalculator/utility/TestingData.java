@@ -4,18 +4,34 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import org.example.projectcalculator.mapper.FeatureMapper;
+import org.example.projectcalculator.mapper.MilestoneMapper;
+import org.example.projectcalculator.mapper.ProjectMapper;
+import org.example.projectcalculator.mapper.RateMapper;
+import org.example.projectcalculator.mapper.TeamMemberMapper;
+import org.example.projectcalculator.mapper.UserMapper;
 import org.example.projectcalculator.model.Feature;
 import org.example.projectcalculator.model.Milestone;
 import org.example.projectcalculator.model.Position;
 import org.example.projectcalculator.model.Project;
+import org.example.projectcalculator.model.Rate;
 import org.example.projectcalculator.model.TeamMember;
 import org.example.projectcalculator.model.User;
+import org.mapstruct.factory.Mappers;
 
 public class TestingData {
 
   public static final Clock CLOCK = Clock.systemUTC();
 
   public static final LocalDateTime NOW = LocalDateTime.now(CLOCK);
+
+  public static final UserMapper USER_MAPPER = Mappers.getMapper(UserMapper.class);
+  public static final ProjectMapper PROJECT_MAPPER = Mappers.getMapper(ProjectMapper.class);
+  public static final MilestoneMapper MILESTONE_MAPPER = Mappers.getMapper(MilestoneMapper.class);
+  public static final FeatureMapper FEATURE_MAPPER = Mappers.getMapper(FeatureMapper.class);
+  public static final TeamMemberMapper TEAM_MEMBER_MAPPER = Mappers.getMapper(
+      TeamMemberMapper.class);
+  public static final RateMapper RATE_MAPPER = Mappers.getMapper(RateMapper.class);
 
   private TestingData() {
   }
@@ -97,6 +113,14 @@ public class TestingData {
         23L,
         Position.SENIOR_DEVELOPER,
         new BigDecimal("2.25"),
+        project);
+  }
+
+  public static Rate createRate(final Project project) {
+    return new Rate(
+        1L,
+        Position.DEVOPS_ENGINEER,
+        new BigDecimal("1250"),
         project);
   }
 }

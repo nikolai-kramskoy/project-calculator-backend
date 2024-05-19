@@ -1,17 +1,21 @@
 package org.example.projectcalculator.controller;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.example.projectcalculator.utility.Asserter.assertProjectsAreEqual;
 import static org.example.projectcalculator.utility.Asserter.assertValidationError;
 import static org.example.projectcalculator.utility.TestingData.createProject;
 import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import java.nio.charset.StandardCharsets;
 import javax.validation.constraints.NotBlank;
 import org.example.projectcalculator.controller.utility.JsonConverter;
+import org.example.projectcalculator.dto.ProjectDto;
+import org.example.projectcalculator.dto.error.ErrorDtoResponse;
+import org.example.projectcalculator.dto.request.CreateUpdateProjectDtoRequest;
+import org.example.projectcalculator.mapper.ProjectMapper;
+import org.example.projectcalculator.service.ProjectService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +25,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.example.projectcalculator.dto.ProjectDto;
-import org.example.projectcalculator.dto.error.ErrorDtoResponse;
-import org.example.projectcalculator.dto.request.CreateUpdateProjectDtoRequest;
-import org.example.projectcalculator.mapper.ProjectMapper;
-import org.example.projectcalculator.model.Project;
-import org.example.projectcalculator.model.User;
-import org.example.projectcalculator.service.ProjectService;
 
 @WebMvcTest(ProjectController.class)
 @ComponentScan(basePackageClasses = ProjectMapper.class)
@@ -68,7 +64,8 @@ class ProjectControllerTest {
     final var response = mvcResult.getResponse();
     Assertions.assertEquals(200, response.getStatus());
 
-    final var actualProjectDto = JsonConverter.jsonToObject(response.getContentAsString(), ProjectDto.class);
+    final var actualProjectDto = JsonConverter.jsonToObject(response.getContentAsString(),
+        ProjectDto.class);
     assertProjectsAreEqual(expectedProjectDto, actualProjectDto);
   }
 

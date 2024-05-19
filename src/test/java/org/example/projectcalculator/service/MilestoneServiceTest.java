@@ -1,42 +1,37 @@
 package org.example.projectcalculator.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.example.projectcalculator.service.utility.ServiceTestHelper.setSecurityContext;
 import static org.example.projectcalculator.utility.Asserter.assertMilestonesAreEqual;
 import static org.example.projectcalculator.utility.TestingData.CLOCK;
+import static org.example.projectcalculator.utility.TestingData.MILESTONE_MAPPER;
 import static org.example.projectcalculator.utility.TestingData.NOW;
 import static org.example.projectcalculator.utility.TestingData.createMilestone1;
 import static org.example.projectcalculator.utility.TestingData.createMilestone2;
 import static org.example.projectcalculator.utility.TestingData.createProject;
 import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import org.example.projectcalculator.error.ProjectCalculatorError;
+import org.example.projectcalculator.error.ProjectCalculatorException;
+import org.example.projectcalculator.model.Milestone;
+import org.example.projectcalculator.repository.MilestoneRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import org.example.projectcalculator.dto.MilestoneDto;
-import org.example.projectcalculator.error.ProjectCalculatorError;
-import org.example.projectcalculator.error.ProjectCalculatorException;
-import org.example.projectcalculator.mapper.MilestoneMapper;
-import org.example.projectcalculator.model.Milestone;
-import org.example.projectcalculator.model.Project;
-import org.example.projectcalculator.model.User;
-import org.example.projectcalculator.repository.MilestoneRepository;
 
-public class MilestoneServiceTest {
+class MilestoneServiceTest {
 
   private UserService userServiceMock;
   private ProjectService projectServiceMock;
+  private PriceService priceServiceMock;
 
   private MilestoneRepository milestoneRepositoryMock;
-
-  private static final MilestoneMapper MILESTONE_MAPPER = Mappers.getMapper(MilestoneMapper.class);
 
   private MilestoneService milestoneService;
 
@@ -44,48 +39,39 @@ public class MilestoneServiceTest {
   public void initMocks() {
     userServiceMock = mock(UserService.class);
     projectServiceMock = mock(ProjectService.class);
+    priceServiceMock = mock(PriceService.class);
 
     milestoneRepositoryMock = mock(MilestoneRepository.class);
 
-    milestoneService = new MilestoneService(userServiceMock, projectServiceMock,
+    milestoneService = new MilestoneService(userServiceMock, projectServiceMock, priceServiceMock,
         milestoneRepositoryMock, CLOCK, MILESTONE_MAPPER);
   }
 
   @Test
-  public void testCreateMilestone_validMilestone_returnCreatedMilestone() {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
-    final Milestone milestone = createMilestone1(project);
+  void testCreateMilestone_validMilestone_returnCreatedMilestone() {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var milestone = createMilestone1(project);
     final var createMilestoneDtoRequest = MILESTONE_MAPPER.toCreateUpdateMilestoneDtoRequest(
         milestone);
     final var expectedMilestoneDto = MILESTONE_MAPPER.toMilestoneDto(milestone);
 
-    setSecurityContext(creator);
-
-    when(projectServiceMock.getProject(eq(project.getId()))).thenReturn(project);
-
-    System.out.println(milestone);
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
 
     when(milestoneRepositoryMock.save(any(Milestone.class))).thenReturn(milestone);
 
-    // Act
+    setSecurityContext(creator);
 
-    final MilestoneDto actualMilestoneDto = milestoneService.saveMilestone(
-        createMilestoneDtoRequest, project.getId());
-
-    // Assert
+    final var actualMilestoneDto = milestoneService.saveMilestone(createMilestoneDtoRequest,
+        project.getId());
 
     assertMilestonesAreEqual(expectedMilestoneDto, actualMilestoneDto);
   }
 
   @Test
-  public void testCreateMilestone_wrongProjectId_throwException() {
-    // Arrange
-
-    final User creator = createUser();
-    Milestone milestone =
+  void testCreateMilestone_wrongProjectId_throwException() {
+    final var creator = createUser();
+    var milestone =
         new Milestone(
             0L,
             null,
@@ -96,18 +82,15 @@ public class MilestoneServiceTest {
             BigDecimal.ZERO,
             null,
             null);
-    final long nonexistentProjectId = 1L;
+    final var nonexistentProjectId = 1L;
     final var createMilestoneDtoRequest = MILESTONE_MAPPER.toCreateUpdateMilestoneDtoRequest(
         milestone);
 
+    when(projectServiceMock.getProject(nonexistentProjectId)).thenThrow(
+        new ProjectCalculatorException(ProjectCalculatorError.PROJECT_IS_NOT_FOUND_BY_ID,
+            "projectId"));
+
     setSecurityContext(creator);
-
-    when(projectServiceMock.getProject(eq(nonexistentProjectId)))
-        .thenThrow(
-            new ProjectCalculatorException(
-                ProjectCalculatorError.PROJECT_IS_NOT_FOUND_BY_ID, "projectId"));
-
-    // Act, assert
 
     final var projectCalculatorException =
         Assertions.assertThrows(
@@ -120,71 +103,57 @@ public class MilestoneServiceTest {
   }
 
   @Test
-  public void testUpdateMilestone_validMilestone_returnUpdatedMilestone() {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
-    final Milestone milestone = createMilestone1(project);
-    final Milestone newMilestone = createMilestone2(project);
+  void testUpdateMilestone_validMilestone_returnUpdatedMilestone() {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var milestone = createMilestone1(project);
+    final var newMilestone = createMilestone2(project);
     newMilestone.setId(1L);
     final var updateMilestoneDtoRequest = MILESTONE_MAPPER.toCreateUpdateMilestoneDtoRequest(
         newMilestone);
     final var expectedMilestoneDto = MILESTONE_MAPPER.toMilestoneDto(newMilestone);
 
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
+
+    when(milestoneRepositoryMock.findByIdAndProjectId(milestone.getId(),
+        project.getId())).thenReturn(Optional.of(milestone));
+
     setSecurityContext(creator);
 
-    when(projectServiceMock.getProject(eq(project.getId()))).thenReturn(project);
-
-    when(milestoneRepositoryMock.findByIdAndProjectId(eq(milestone.getId()), eq(project.getId())))
-        .thenReturn(Optional.of(milestone));
-
-    // Act
-
-    final MilestoneDto actualMilestoneDto = milestoneService.updateMilestone(
-        updateMilestoneDtoRequest, project.getId(), milestone.getId());
-
-    // Assert
+    final var actualMilestoneDto = milestoneService.updateMilestone(updateMilestoneDtoRequest,
+        project.getId(), milestone.getId());
 
     assertMilestonesAreEqual(expectedMilestoneDto, actualMilestoneDto);
   }
 
   @Test
-  public void testDeleteMilestone_validMilestone_returnVoid() {
-    // Arrange
+  void testDeleteMilestone_validMilestone_returnVoid() {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var milestone = createMilestone1(project);
 
-    final User creator = createUser();
-    final Project project = createProject(creator);
-    final Milestone milestone = createMilestone1(project);
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
 
-    setSecurityContext(creator);
-
-    when(projectServiceMock.getProject(eq(project.getId()))).thenReturn(project);
-
-    when(milestoneRepositoryMock.findByIdAndProjectId(eq(milestone.getId()), eq(project.getId())))
+    when(milestoneRepositoryMock.findByIdAndProjectId(milestone.getId(), eq(project.getId())))
         .thenReturn(Optional.of(milestone));
 
-    // Act, assert
+    setSecurityContext(creator);
 
     Assertions.assertDoesNotThrow(
         () -> milestoneService.deleteMilestone(project.getId(), milestone.getId()));
   }
 
   @Test
-  public void testDeleteMilestone_wrongMilestoneId_throwException() {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
+  void testDeleteMilestone_wrongMilestoneId_throwException() {
+    final var creator = createUser();
+    final var project = createProject(creator);
     final long nonexistentMilestoneId = 1L;
 
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
+
+    when(milestoneRepositoryMock.findById(nonexistentMilestoneId)).thenReturn(Optional.empty());
+
     setSecurityContext(creator);
-
-    when(projectServiceMock.getProject(eq(project.getId()))).thenReturn(project);
-
-    when(milestoneRepositoryMock.findById(eq(nonexistentMilestoneId))).thenReturn(Optional.empty());
-
-    // Act, assert
 
     final var projectCalculatorException =
         Assertions.assertThrows(
@@ -197,27 +166,21 @@ public class MilestoneServiceTest {
   }
 
   @Test
-  public void testGetAllMilestones_validArguments_returnList() {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
+  void testGetAllMilestones_validArguments_returnList() {
+    final var creator = createUser();
+    final var project = createProject(creator);
     final var milestones =
         List.of(
             createMilestone1(project),
             createMilestone2(project));
 
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
+
+    when(milestoneRepositoryMock.findAllByProjectId(project.getId())).thenReturn(milestones);
+
     setSecurityContext(creator);
 
-    when(projectServiceMock.getProject(eq(project.getId()))).thenReturn(project);
-
-    when(milestoneRepositoryMock.findAllByProjectId(eq(project.getId()))).thenReturn(milestones);
-
-    // Act
-
     final var milestonesFromService = milestoneService.getAllMilestones(project.getId());
-
-    // Assert
 
     Assertions.assertNotNull(milestonesFromService);
     Assertions.assertEquals(2, milestonesFromService.size());

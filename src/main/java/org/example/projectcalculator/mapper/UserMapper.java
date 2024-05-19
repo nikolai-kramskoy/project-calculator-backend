@@ -1,13 +1,13 @@
 package org.example.projectcalculator.mapper;
 
 import java.time.LocalDateTime;
+import org.example.projectcalculator.dto.UserDto;
+import org.example.projectcalculator.dto.request.CreateUserDtoRequest;
+import org.example.projectcalculator.model.User;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
-import org.example.projectcalculator.dto.UserDto;
-import org.example.projectcalculator.dto.request.CreateUserDtoRequest;
-import org.example.projectcalculator.model.User;
 
 @Mapper(componentModel = ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface UserMapper {

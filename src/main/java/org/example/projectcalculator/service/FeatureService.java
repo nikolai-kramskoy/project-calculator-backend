@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.example.projectcalculator.dto.FeatureDto;
 import org.example.projectcalculator.dto.request.CreateFeatureDtoRequest;
 import org.example.projectcalculator.dto.request.UpdateFeatureDtoRequest;
@@ -22,6 +20,8 @@ import org.example.projectcalculator.repository.MilestoneRepository;
 import org.example.projectcalculator.repository.ProjectRepository;
 import org.example.projectcalculator.repository.RateRepository;
 import org.example.projectcalculator.repository.TeamMemberRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A {@link Service} that provides operations on {@link Feature}.

@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.example.projectcalculator.dto.RateDto;
 import org.example.projectcalculator.dto.request.UpdateRateDtoRequest;
 import org.example.projectcalculator.error.ProjectCalculatorError;
@@ -17,6 +15,8 @@ import org.example.projectcalculator.model.Rate;
 import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.ProjectRepository;
 import org.example.projectcalculator.repository.RateRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A {@link Service} that provides operations on {@link Rate}.

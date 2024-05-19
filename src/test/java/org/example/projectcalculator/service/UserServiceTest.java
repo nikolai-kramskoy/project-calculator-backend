@@ -1,34 +1,28 @@
 package org.example.projectcalculator.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.example.projectcalculator.utility.Asserter.assertUsersAreEqual;
 import static org.example.projectcalculator.utility.TestingData.CLOCK;
+import static org.example.projectcalculator.utility.TestingData.USER_MAPPER;
 import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import org.example.projectcalculator.service.UserService;
+import org.example.projectcalculator.error.ProjectCalculatorError;
+import org.example.projectcalculator.error.ProjectCalculatorException;
+import org.example.projectcalculator.model.User;
+import org.example.projectcalculator.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.example.projectcalculator.dto.UserDto;
-import org.example.projectcalculator.error.ProjectCalculatorError;
-import org.example.projectcalculator.error.ProjectCalculatorException;
-import org.example.projectcalculator.mapper.UserMapper;
-import org.example.projectcalculator.model.User;
-import org.example.projectcalculator.repository.UserRepository;
 
-public class UserServiceTest {
+class UserServiceTest {
 
   private UserRepository userRepositoryMock;
 
   private PasswordEncoder passwordEncoderMock;
-
-  private static final UserMapper USER_MAPPER = Mappers.getMapper(UserMapper.class);
 
   private UserService userService;
 
@@ -42,40 +36,29 @@ public class UserServiceTest {
   }
 
   @Test
-  public void testCreateUser_validUser_returnCreatedUser() {
-    // Arrange
-
-    final User user = createUser();
-    final String userPassword = "qwerty123";
+  void testCreateUser_validUser_returnCreatedUser() {
+    final var user = createUser();
+    final var userPassword = "qwerty123";
     final var createUserDtoRequest = USER_MAPPER.toCreateUserDtoRequest(user, userPassword);
     final var expectedUserDto = USER_MAPPER.toUserDto(user);
 
-    when(userRepositoryMock.findByLogin(eq(user.getLogin()))).thenReturn(Optional.empty());
+    when(userRepositoryMock.findByLogin(user.getLogin())).thenReturn(Optional.empty());
     when(userRepositoryMock.save(any(User.class))).thenReturn(user);
 
-    when(passwordEncoderMock.encode(eq(userPassword)))
-        .thenReturn(user.getPasswordHash());
+    when(passwordEncoderMock.encode(userPassword)).thenReturn(user.getPasswordHash());
 
-    // Act
-
-    final UserDto actualUserDto = userService.saveUser(createUserDtoRequest);
-
-    // Assert
+    final var actualUserDto = userService.saveUser(createUserDtoRequest);
 
     assertUsersAreEqual(expectedUserDto, actualUserDto);
   }
 
   @Test
-  public void testCreateUser_loginAlreadyExists_throwException() {
-    // Arrange
-
-    User user = new User(0L, "someUser", null, "blah@example.com", null, null);
-    final String userPassword = "qwerty123";
+  void testCreateUser_loginAlreadyExists_throwException() {
+    var user = new User(0L, "someUser", null, "blah@example.com", null, null);
+    final var userPassword = "qwerty123";
     final var createUserDtoRequest = USER_MAPPER.toCreateUserDtoRequest(user, userPassword);
 
-    when(userRepositoryMock.findByLogin(eq(user.getLogin()))).thenReturn(Optional.of(user));
-
-    // Act, assert
+    when(userRepositoryMock.findByLogin(user.getLogin())).thenReturn(Optional.of(user));
 
     final var projectCalculatorException =
         Assertions.assertThrows(

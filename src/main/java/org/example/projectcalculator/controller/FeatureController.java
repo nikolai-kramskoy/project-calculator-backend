@@ -7,6 +7,10 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import org.example.projectcalculator.dto.FeatureDto;
+import org.example.projectcalculator.dto.request.CreateFeatureDtoRequest;
+import org.example.projectcalculator.dto.request.UpdateFeatureDtoRequest;
+import org.example.projectcalculator.service.FeatureService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,10 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.example.projectcalculator.dto.FeatureDto;
-import org.example.projectcalculator.dto.request.CreateFeatureDtoRequest;
-import org.example.projectcalculator.dto.request.UpdateFeatureDtoRequest;
-import org.example.projectcalculator.service.FeatureService;
 
 @RestController
 @RequestMapping("/projects/{projectId}/features")

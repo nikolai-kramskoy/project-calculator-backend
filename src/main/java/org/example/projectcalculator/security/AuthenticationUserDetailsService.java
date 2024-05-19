@@ -5,13 +5,13 @@ import static org.springframework.security.core.userdetails.User.withUsername;
 import java.util.Collections;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.projectcalculator.model.User;
+import org.example.projectcalculator.repository.UserRepository;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.example.projectcalculator.model.User;
-import org.example.projectcalculator.repository.UserRepository;
 
 /**
  * A {@link UserDetailsService} that provides {@link UserDetails} to

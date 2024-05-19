@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.example.projectcalculator.model.Position;
+import org.springframework.stereotype.Service;
 
 /**
  * A {@link Service} that provides operations on {@link Position}.

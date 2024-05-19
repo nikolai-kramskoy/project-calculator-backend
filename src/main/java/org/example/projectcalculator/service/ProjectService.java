@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.example.projectcalculator.dto.ProjectDto;
 import org.example.projectcalculator.dto.request.CreateUpdateProjectDtoRequest;
 import org.example.projectcalculator.error.ProjectCalculatorError;
@@ -22,6 +20,8 @@ import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.ProjectRepository;
 import org.example.projectcalculator.repository.RateRepository;
 import org.example.projectcalculator.repository.TeamMemberRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A {@link Service} that provides operations on {@link Project}.

@@ -1,17 +1,25 @@
 package org.example.projectcalculator.controller.security;
 
+import static org.example.projectcalculator.utility.TestingData.createProject;
+import static org.example.projectcalculator.utility.TestingData.createUser;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.example.projectcalculator.utility.TestingData.createProject;
-import static org.example.projectcalculator.utility.TestingData.createUser;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import org.example.projectcalculator.controller.ProjectController;
+import org.example.projectcalculator.controller.UserController;
 import org.example.projectcalculator.controller.utility.JsonConverter;
+import org.example.projectcalculator.mapper.ProjectMapper;
+import org.example.projectcalculator.mapper.UserMapper;
+import org.example.projectcalculator.repository.UserRepository;
+import org.example.projectcalculator.security.WebSecurityConfiguration;
+import org.example.projectcalculator.service.ProjectService;
+import org.example.projectcalculator.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +30,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.example.projectcalculator.controller.ProjectController;
-import org.example.projectcalculator.controller.UserController;
-import org.example.projectcalculator.mapper.ProjectMapper;
-import org.example.projectcalculator.mapper.UserMapper;
-import org.example.projectcalculator.repository.UserRepository;
-import org.example.projectcalculator.security.WebSecurityConfiguration;
-import org.example.projectcalculator.service.ProjectService;
-import org.example.projectcalculator.service.UserService;
 
 @WebMvcTest(controllers = {UserController.class, ProjectController.class})
 @ComponentScan(basePackageClasses = {WebSecurityConfiguration.class, UserMapper.class})

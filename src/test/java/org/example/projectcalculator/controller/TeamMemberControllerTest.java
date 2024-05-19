@@ -3,9 +3,7 @@ package org.example.projectcalculator.controller;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -15,8 +13,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import org.example.projectcalculator.controller.utility.JsonConverter;
+import org.example.projectcalculator.dto.TeamMemberDto;
+import org.example.projectcalculator.dto.error.ErrorDto;
+import org.example.projectcalculator.dto.error.ErrorDtoResponse;
+import org.example.projectcalculator.dto.request.CreateUpdateTeamMemberDtoRequest;
+import org.example.projectcalculator.mapper.TeamMemberMapper;
+import org.example.projectcalculator.model.Position;
+import org.example.projectcalculator.model.TeamMember;
+import org.example.projectcalculator.service.TeamMemberService;
+import org.example.projectcalculator.utility.TestingData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,18 +31,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.example.projectcalculator.dto.TeamMemberDto;
-import org.example.projectcalculator.dto.error.ErrorDto;
-import org.example.projectcalculator.dto.error.ErrorDtoResponse;
-import org.example.projectcalculator.dto.request.CreateUpdateTeamMemberDtoRequest;
-import org.example.projectcalculator.mapper.TeamMemberMapper;
-import org.example.projectcalculator.model.Position;
-import org.example.projectcalculator.model.Project;
-import org.example.projectcalculator.model.TeamMember;
-import org.example.projectcalculator.model.User;
-import org.example.projectcalculator.service.TeamMemberService;
-import org.example.projectcalculator.utility.TestingData;
 
 @WebMvcTest(TeamMemberController.class)
 @ComponentScan(basePackageClasses = TeamMemberMapper.class)
@@ -71,7 +65,8 @@ class TeamMemberControllerTest {
     final var teamMember = createTeamMember();
     final var expectedTeamMemberDto = teamMemberMapper.toTeamDto(teamMember);
 
-    when(teamMemberService.saveTeamMember(request, project.getId())).thenReturn(expectedTeamMemberDto);
+    when(teamMemberService.saveTeamMember(request, project.getId())).thenReturn(
+        expectedTeamMemberDto);
 
     final var result = mockMvc.perform(post(TEAM_API_URL, project.getId())
             .with(csrf())
@@ -80,7 +75,8 @@ class TeamMemberControllerTest {
             .content(JsonConverter.objectToJson(request)))
         .andReturn();
 
-    final var teamMemberDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), TeamMemberDto.class);
+    final var teamMemberDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
+        TeamMemberDto.class);
 
     assertAll(
         () -> assertEquals(200, result.getResponse().getStatus()),
@@ -102,7 +98,8 @@ class TeamMemberControllerTest {
             .content(JsonConverter.objectToJson(request)))
         .andReturn();
 
-    final var response = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), ErrorDtoResponse.class);
+    final var response = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
+        ErrorDtoResponse.class);
 
     assertAll(
         () -> assertEquals(400, result.getResponse().getStatus()),
@@ -117,7 +114,8 @@ class TeamMemberControllerTest {
         NUMBER_OF_TEAM_MEMBERS);
     final var expectedTeamMemberDto = teamMemberMapper.toTeamDto(teamMember);
 
-    when(teamMemberService.updateTeamMember(request, teamMember.getProject().getId(), teamMember.getId())).thenReturn(expectedTeamMemberDto);
+    when(teamMemberService.updateTeamMember(request, teamMember.getProject().getId(),
+        teamMember.getId())).thenReturn(expectedTeamMemberDto);
 
     final var result = mockMvc.perform(put(SPECIFIC_TEAM_API_URL)
             .with(csrf())
@@ -126,7 +124,8 @@ class TeamMemberControllerTest {
             .content(JsonConverter.objectToJson(request)))
         .andReturn();
 
-    final var teamMemberDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), TeamMemberDto.class);
+    final var teamMemberDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
+        TeamMemberDto.class);
 
     assertAll(
         () -> assertEquals(200, result.getResponse().getStatus()),
@@ -148,7 +147,8 @@ class TeamMemberControllerTest {
             .content(JsonConverter.objectToJson(request)))
         .andReturn();
 
-    final var errorDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(), ErrorDto.class);
+    final var errorDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
+        ErrorDto.class);
 
     assertAll(
         () -> assertEquals(400, result.getResponse().getStatus()),
@@ -163,7 +163,8 @@ class TeamMemberControllerTest {
     final var creator = TestingData.createUser();
     final var project = TestingData.createProject(creator);
     final var teamMember = createTeamMember();
-    final var request = new CreateUpdateTeamMemberDtoRequest(teamMember.getPosition().name(), teamMember.getNumberOfTeamMembers());
+    final var request = new CreateUpdateTeamMemberDtoRequest(teamMember.getPosition().name(),
+        teamMember.getNumberOfTeamMembers());
 
     final var result = mockMvc.perform(get(TEAM_API_URL, project.getId())
             .with(csrf())
@@ -172,7 +173,8 @@ class TeamMemberControllerTest {
             .content(JsonConverter.objectToJson(request)))
         .andReturn();
 
-    final var teamMemberDtos = JsonConverter.jsonToListOfObjects(result.getResponse().getContentAsString(), TeamMemberDto.class);
+    final var teamMemberDtos = JsonConverter.jsonToListOfObjects(
+        result.getResponse().getContentAsString(), TeamMemberDto.class);
 
     assertAll(
         () -> assertEquals(200, result.getResponse().getStatus()),

@@ -1,43 +1,39 @@
 package org.example.projectcalculator.service;
 
+import static org.example.projectcalculator.service.utility.ServiceTestHelper.setSecurityContext;
+import static org.example.projectcalculator.utility.Asserter.assertProjectsAreEqual;
+import static org.example.projectcalculator.utility.TestingData.CLOCK;
+import static org.example.projectcalculator.utility.TestingData.PROJECT_MAPPER;
+import static org.example.projectcalculator.utility.TestingData.createProject;
+import static org.example.projectcalculator.utility.TestingData.createUser;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.example.projectcalculator.utility.Asserter.assertProjectsAreEqual;
-import static org.example.projectcalculator.utility.TestingData.CLOCK;
-import static org.example.projectcalculator.utility.TestingData.createProject;
-import static org.example.projectcalculator.utility.TestingData.createUser;
 
 import java.util.List;
-import org.example.projectcalculator.service.utility.ServiceTestHelper;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import org.example.projectcalculator.dto.ProjectDto;
-import org.example.projectcalculator.mapper.ProjectMapper;
-import org.example.projectcalculator.model.Project;
 import org.example.projectcalculator.model.Rate;
-import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.ProjectRepository;
 import org.example.projectcalculator.repository.RateRepository;
 import org.example.projectcalculator.repository.TeamMemberRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class ProjectServiceTest {
+class ProjectServiceTest {
 
   private UserService userServiceMock;
+  private PriceService priceServiceMock;
 
   private ProjectRepository projectRepositoryMock;
   private RateRepository rateRepositoryMock;
   private TeamMemberRepository teamMemberRepositoryMock;
-
-  private static final ProjectMapper PROJECT_MAPPER = Mappers.getMapper(ProjectMapper.class);
 
   private ProjectService projectService;
 
   @BeforeEach
   public void initMocks() {
     userServiceMock = mock(UserService.class);
+    priceServiceMock = mock(PriceService.class);
 
     projectRepositoryMock = mock(ProjectRepository.class);
     rateRepositoryMock = mock(RateRepository.class);
@@ -45,21 +41,21 @@ public class ProjectServiceTest {
 
     projectService =
         new ProjectService(
-            userServiceMock, projectRepositoryMock, rateRepositoryMock, teamMemberRepositoryMock,
+            userServiceMock,
+            priceServiceMock,
+            projectRepositoryMock,
+            rateRepositoryMock,
+            teamMemberRepositoryMock,
             CLOCK,
             PROJECT_MAPPER);
   }
 
   @Test
-  public void testCreateProject_validProject_returnCreatedProject() {
-    // Arrange
-
-    final User creator = createUser();
-    final Project project = createProject(creator);
+  void testCreateProject_validProject_returnCreatedProject() {
+    final var creator = createUser();
+    final var project = createProject(creator);
     final var createProjectDtoRequest = PROJECT_MAPPER.toCreateProjectDtoRequest(project);
     final var expectedProjectDto = PROJECT_MAPPER.toProjectDto(project);
-
-    ServiceTestHelper.setSecurityContext(creator);
 
     when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
 
@@ -79,11 +75,9 @@ public class ProjectServiceTest {
               return rates;
             });
 
-    // Act
+    setSecurityContext(creator);
 
-    final ProjectDto actualProjectDto = projectService.saveProject(createProjectDtoRequest);
-
-    // Assert
+    final var actualProjectDto = projectService.saveProject(createProjectDtoRequest);
 
     assertProjectsAreEqual(expectedProjectDto, actualProjectDto);
   }

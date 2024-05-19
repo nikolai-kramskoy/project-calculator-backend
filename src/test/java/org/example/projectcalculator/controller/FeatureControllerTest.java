@@ -1,11 +1,5 @@
 package org.example.projectcalculator.controller;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.example.projectcalculator.utility.Asserter.assertFeaturesAreEqual;
 import static org.example.projectcalculator.utility.Asserter.assertValidationError;
 import static org.example.projectcalculator.utility.TestingData.createFeature1;
@@ -14,12 +8,23 @@ import static org.example.projectcalculator.utility.TestingData.createMilestone1
 import static org.example.projectcalculator.utility.TestingData.createMilestone2;
 import static org.example.projectcalculator.utility.TestingData.createProject;
 import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import org.example.projectcalculator.controller.utility.JsonConverter;
+import org.example.projectcalculator.dto.FeatureDto;
+import org.example.projectcalculator.dto.error.ErrorDtoResponse;
+import org.example.projectcalculator.dto.request.CreateFeatureDtoRequest;
+import org.example.projectcalculator.mapper.FeatureMapper;
+import org.example.projectcalculator.model.Feature;
+import org.example.projectcalculator.service.FeatureService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +34,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.example.projectcalculator.dto.FeatureDto;
-import org.example.projectcalculator.dto.error.ErrorDtoResponse;
-import org.example.projectcalculator.dto.request.CreateFeatureDtoRequest;
-import org.example.projectcalculator.mapper.FeatureMapper;
-import org.example.projectcalculator.model.Feature;
-import org.example.projectcalculator.model.Milestone;
-import org.example.projectcalculator.model.Project;
-import org.example.projectcalculator.model.User;
-import org.example.projectcalculator.service.FeatureService;
 
 @WebMvcTest(FeatureController.class)
 @ComponentScan(basePackageClasses = FeatureMapper.class)
@@ -66,7 +61,8 @@ class FeatureControllerTest {
     final var createFeatureDtoRequest = featureMapper.toCreateFeatureDtoRequest(feature);
     final var expectedFeatureDto = featureMapper.toFeatureDto(feature);
 
-    when(featureServiceMock.saveFeature(createFeatureDtoRequest, project.getId())).thenReturn(expectedFeatureDto);
+    when(featureServiceMock.saveFeature(createFeatureDtoRequest, project.getId())).thenReturn(
+        expectedFeatureDto);
 
     final var mvcResult =
         mockMvc
@@ -82,7 +78,8 @@ class FeatureControllerTest {
 
     Assertions.assertEquals(200, response.getStatus());
 
-    final var actualFeatureDto = JsonConverter.jsonToObject(response.getContentAsString(), FeatureDto.class);
+    final var actualFeatureDto = JsonConverter.jsonToObject(response.getContentAsString(),
+        FeatureDto.class);
 
     assertFeaturesAreEqual(expectedFeatureDto, actualFeatureDto);
   }
@@ -163,7 +160,8 @@ class FeatureControllerTest {
         null);
     final var expectedFeatureDto = featureMapper.toFeatureDto(updatedFeature);
 
-    when(featureServiceMock.updateFeature(updateFeatureDtoRequest, project.getId(), feature.getId())).thenReturn(expectedFeatureDto);
+    when(featureServiceMock.updateFeature(updateFeatureDtoRequest, project.getId(),
+        feature.getId())).thenReturn(expectedFeatureDto);
 
     final var mvcResult =
         mockMvc
@@ -179,7 +177,8 @@ class FeatureControllerTest {
 
     Assertions.assertEquals(200, response.getStatus());
 
-    final var actualFeatureDto = JsonConverter.jsonToObject(response.getContentAsString(), FeatureDto.class);
+    final var actualFeatureDto = JsonConverter.jsonToObject(response.getContentAsString(),
+        FeatureDto.class);
 
     assertFeaturesAreEqual(expectedFeatureDto, actualFeatureDto);
   }
@@ -196,7 +195,8 @@ class FeatureControllerTest {
         newMilestone.getId());
     final var expectedFeatureDto = featureMapper.toFeatureDto(updatedFeature);
 
-    when(featureServiceMock.updateFeature(updateFeatureDtoRequest, project.getId(), feature.getId())).thenReturn(expectedFeatureDto);
+    when(featureServiceMock.updateFeature(updateFeatureDtoRequest, project.getId(),
+        feature.getId())).thenReturn(expectedFeatureDto);
 
     final var mvcResult =
         mockMvc
@@ -212,7 +212,8 @@ class FeatureControllerTest {
 
     Assertions.assertEquals(200, response.getStatus());
 
-    final var actualFeatureDto = JsonConverter.jsonToObject(response.getContentAsString(), FeatureDto.class);
+    final var actualFeatureDto = JsonConverter.jsonToObject(response.getContentAsString(),
+        FeatureDto.class);
 
     assertFeaturesAreEqual(expectedFeatureDto, actualFeatureDto);
   }
@@ -227,7 +228,8 @@ class FeatureControllerTest {
     final var expectedFeatureDtos = List.of(featureMapper.toFeatureDto(feature1),
         featureMapper.toFeatureDto(feature2));
 
-    when(featureServiceMock.getAllFeatures(project.getId(), milestone.getId())).thenReturn(Collections.singletonList(expectedFeatureDtos.get(0)));
+    when(featureServiceMock.getAllFeatures(project.getId(), milestone.getId())).thenReturn(
+        Collections.singletonList(expectedFeatureDtos.get(0)));
 
     final var mvcResult =
         mockMvc

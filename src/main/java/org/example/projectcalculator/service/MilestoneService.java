@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.example.projectcalculator.dto.MilestoneDto;
 import org.example.projectcalculator.dto.request.CreateUpdateMilestoneDtoRequest;
 import org.example.projectcalculator.error.ProjectCalculatorError;
@@ -18,6 +16,8 @@ import org.example.projectcalculator.model.Project;
 import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.MilestoneRepository;
 import org.example.projectcalculator.repository.ProjectRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A {@link Service} that provides CRUD operations on {@link Milestone}.

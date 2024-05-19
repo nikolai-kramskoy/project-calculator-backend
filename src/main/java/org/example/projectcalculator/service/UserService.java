@@ -4,11 +4,6 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.example.projectcalculator.dto.UserDto;
 import org.example.projectcalculator.dto.request.CreateUserDtoRequest;
 import org.example.projectcalculator.dto.request.UpdateUserDtoRequest;
@@ -17,6 +12,11 @@ import org.example.projectcalculator.error.ProjectCalculatorException;
 import org.example.projectcalculator.mapper.UserMapper;
 import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A {@link Service} that saves {@link User}.

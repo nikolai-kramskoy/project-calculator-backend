@@ -1,12 +1,12 @@
 package org.example.projectcalculator.utility;
 
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.example.projectcalculator.dto.FeatureDto;
 import org.example.projectcalculator.dto.MilestoneDto;
 import org.example.projectcalculator.dto.ProjectDto;
 import org.example.projectcalculator.dto.UserDto;
 import org.example.projectcalculator.dto.error.ErrorDto;
+import org.junit.jupiter.api.Assertions;
 
 public class Asserter {
 
@@ -28,6 +28,13 @@ public class Asserter {
     Assertions.assertEquals(expectedErrorMessage, error.get().errorMessage());
   }
 
+  public static void assertUsersAreEqual(
+      final UserDto expectedUser, final UserDto actualUser) {
+    Assertions.assertEquals(expectedUser.id(), actualUser.id());
+    Assertions.assertEquals(expectedUser.login(), actualUser.login());
+    Assertions.assertEquals(expectedUser.email(), actualUser.email());
+  }
+
   public static void assertProjectsAreEqual(
       final ProjectDto expectedProject, final ProjectDto actualProject) {
     Assertions.assertEquals(expectedProject.id(), actualProject.id());
@@ -37,13 +44,6 @@ public class Asserter {
     Assertions.assertEquals(expectedProject.creatorId(), actualProject.creatorId());
     Assertions.assertEquals(expectedProject.estimateInDays(), actualProject.estimateInDays());
     Assertions.assertEquals(expectedProject.priceInRubles(), actualProject.priceInRubles());
-  }
-
-  public static void assertUsersAreEqual(
-      final UserDto expectedUser, final UserDto actualUser) {
-    Assertions.assertEquals(expectedUser.id(), actualUser.id());
-    Assertions.assertEquals(expectedUser.login(), actualUser.login());
-    Assertions.assertEquals(expectedUser.email(), actualUser.email());
   }
 
   public static void assertMilestonesAreEqual(

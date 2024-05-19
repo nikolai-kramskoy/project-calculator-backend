@@ -1,17 +1,21 @@
 package org.example.projectcalculator.controller;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.example.projectcalculator.controller.utility.JsonConverter.jsonToObject;
 import static org.example.projectcalculator.controller.utility.JsonConverter.objectToJson;
 import static org.example.projectcalculator.utility.Asserter.assertUsersAreEqual;
 import static org.example.projectcalculator.utility.Asserter.assertValidationError;
 import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import java.nio.charset.StandardCharsets;
 import javax.validation.constraints.NotBlank;
+import org.example.projectcalculator.dto.UserDto;
+import org.example.projectcalculator.dto.error.ErrorDtoResponse;
+import org.example.projectcalculator.dto.request.CreateUserDtoRequest;
+import org.example.projectcalculator.mapper.UserMapper;
+import org.example.projectcalculator.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +25,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.example.projectcalculator.dto.UserDto;
-import org.example.projectcalculator.dto.error.ErrorDtoResponse;
-import org.example.projectcalculator.dto.request.CreateUserDtoRequest;
-import org.example.projectcalculator.mapper.UserMapper;
-import org.example.projectcalculator.model.User;
-import org.example.projectcalculator.service.UserService;
 
 @WebMvcTest(UserController.class)
 @ComponentScan(basePackageClasses = UserMapper.class)

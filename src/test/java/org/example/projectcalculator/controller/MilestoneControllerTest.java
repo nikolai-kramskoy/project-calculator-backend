@@ -1,12 +1,5 @@
 package org.example.projectcalculator.controller;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.example.projectcalculator.utility.Asserter.assertMilestonesAreEqual;
 import static org.example.projectcalculator.utility.Asserter.assertValidationError;
 import static org.example.projectcalculator.utility.TestingData.NOW;
@@ -14,11 +7,23 @@ import static org.example.projectcalculator.utility.TestingData.createMilestone1
 import static org.example.projectcalculator.utility.TestingData.createMilestone2;
 import static org.example.projectcalculator.utility.TestingData.createProject;
 import static org.example.projectcalculator.utility.TestingData.createUser;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import org.example.projectcalculator.controller.utility.JsonConverter;
+import org.example.projectcalculator.dto.MilestoneDto;
+import org.example.projectcalculator.dto.error.ErrorDtoResponse;
+import org.example.projectcalculator.dto.request.CreateUpdateMilestoneDtoRequest;
+import org.example.projectcalculator.dto.request.validation.annotation.MilestoneDates;
+import org.example.projectcalculator.mapper.MilestoneMapper;
+import org.example.projectcalculator.service.MilestoneService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +33,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.example.projectcalculator.dto.MilestoneDto;
-import org.example.projectcalculator.dto.error.ErrorDtoResponse;
-import org.example.projectcalculator.dto.request.CreateUpdateMilestoneDtoRequest;
-import org.example.projectcalculator.dto.request.validation.annotation.MilestoneDates;
-import org.example.projectcalculator.mapper.MilestoneMapper;
-import org.example.projectcalculator.model.Milestone;
-import org.example.projectcalculator.model.Project;
-import org.example.projectcalculator.model.User;
-import org.example.projectcalculator.service.MilestoneService;
 
 @WebMvcTest(MilestoneController.class)
 @ComponentScan(basePackageClasses = MilestoneMapper.class)
@@ -66,7 +61,8 @@ class MilestoneControllerTest {
         milestone);
     final var expectedMilestoneDto = milestoneMapper.toMilestoneDto(milestone);
 
-    when(milestoneServiceMock.saveMilestone(createMilestoneDtoRequest, project.getId())).thenReturn(expectedMilestoneDto);
+    when(milestoneServiceMock.saveMilestone(createMilestoneDtoRequest, project.getId())).thenReturn(
+        expectedMilestoneDto);
 
     final var mvcResult =
         mockMvc
@@ -82,7 +78,8 @@ class MilestoneControllerTest {
 
     Assertions.assertEquals(200, response.getStatus());
 
-    final var actualMilestoneDto = JsonConverter.jsonToObject(response.getContentAsString(), MilestoneDto.class);
+    final var actualMilestoneDto = JsonConverter.jsonToObject(response.getContentAsString(),
+        MilestoneDto.class);
 
     assertMilestonesAreEqual(expectedMilestoneDto, actualMilestoneDto);
   }
@@ -168,7 +165,8 @@ class MilestoneControllerTest {
         updatedMilestone);
     final var expectedMilestoneDto = milestoneMapper.toMilestoneDto(updatedMilestone);
 
-    when(milestoneServiceMock.updateMilestone(updateMilestoneDtoRequest, project.getId(), updatedMilestone.getId())).thenReturn(expectedMilestoneDto);
+    when(milestoneServiceMock.updateMilestone(updateMilestoneDtoRequest, project.getId(),
+        updatedMilestone.getId())).thenReturn(expectedMilestoneDto);
 
     final var mvcResult =
         mockMvc
@@ -184,7 +182,8 @@ class MilestoneControllerTest {
 
     Assertions.assertEquals(200, response.getStatus());
 
-    final var actualMilestoneDto = JsonConverter.jsonToObject(response.getContentAsString(), MilestoneDto.class);
+    final var actualMilestoneDto = JsonConverter.jsonToObject(response.getContentAsString(),
+        MilestoneDto.class);
 
     assertMilestonesAreEqual(expectedMilestoneDto, actualMilestoneDto);
   }
@@ -233,7 +232,8 @@ class MilestoneControllerTest {
 
     Assertions.assertEquals(200, response.getStatus());
 
-    final var actualMilestoneDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(), MilestoneDto.class);
+    final var actualMilestoneDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
+        MilestoneDto.class);
 
     Assertions.assertEquals(2, actualMilestoneDtos.size());
   }

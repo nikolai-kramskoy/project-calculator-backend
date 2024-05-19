@@ -3,8 +3,8 @@ package org.example.projectcalculator.dto.request.validation.validator;
 import java.math.BigDecimal;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import org.example.projectcalculator.dto.request.validation.annotation.FeatureEstimates;
 import org.example.projectcalculator.dto.request.CreateUpdateFeatureDtoRequest;
+import org.example.projectcalculator.dto.request.validation.annotation.FeatureEstimates;
 
 public class FeatureEstimatesValidator implements
     ConstraintValidator<FeatureEstimates, CreateUpdateFeatureDtoRequest> {

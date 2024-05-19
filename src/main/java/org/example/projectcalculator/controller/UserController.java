@@ -6,6 +6,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import org.example.projectcalculator.dto.UserDto;
+import org.example.projectcalculator.dto.request.CreateUserDtoRequest;
+import org.example.projectcalculator.dto.request.UpdateUserDtoRequest;
+import org.example.projectcalculator.service.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,10 +20,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.example.projectcalculator.dto.UserDto;
-import org.example.projectcalculator.dto.request.CreateUserDtoRequest;
-import org.example.projectcalculator.dto.request.UpdateUserDtoRequest;
-import org.example.projectcalculator.service.UserService;
 
 @RestController
 @RequestMapping("/users")

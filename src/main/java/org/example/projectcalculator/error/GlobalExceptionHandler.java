@@ -6,6 +6,8 @@ import java.util.List;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
 import lombok.extern.slf4j.Slf4j;
+import org.example.projectcalculator.dto.error.ErrorDto;
+import org.example.projectcalculator.dto.error.ErrorDtoResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +15,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.example.projectcalculator.dto.error.ErrorDto;
-import org.example.projectcalculator.dto.error.ErrorDtoResponse;
 
 @RestControllerAdvice
 @Slf4j

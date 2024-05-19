@@ -2,16 +2,16 @@ package org.example.projectcalculator.mapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import org.mapstruct.InjectionStrategy;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants.ComponentModel;
 import org.example.projectcalculator.dto.FeatureDto;
 import org.example.projectcalculator.dto.request.CreateFeatureDtoRequest;
 import org.example.projectcalculator.dto.request.UpdateFeatureDtoRequest;
 import org.example.projectcalculator.model.Feature;
 import org.example.projectcalculator.model.Milestone;
 import org.example.projectcalculator.model.Project;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants.ComponentModel;
 
 @Mapper(componentModel = ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface FeatureMapper {

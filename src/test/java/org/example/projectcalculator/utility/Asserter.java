@@ -4,6 +4,8 @@ import java.util.List;
 import org.example.projectcalculator.dto.FeatureDto;
 import org.example.projectcalculator.dto.MilestoneDto;
 import org.example.projectcalculator.dto.ProjectDto;
+import org.example.projectcalculator.dto.RateDto;
+import org.example.projectcalculator.dto.TeamMemberDto;
 import org.example.projectcalculator.dto.UserDto;
 import org.example.projectcalculator.dto.error.ErrorDto;
 import org.junit.jupiter.api.Assertions;
@@ -73,5 +75,20 @@ public class Asserter {
         actualFeature.worstCaseEstimateInDays());
     Assertions.assertEquals(expectedFeature.estimateInDays(),
         actualFeature.estimateInDays());
+  }
+
+  public static void assertTeamMembersAreEqual(final TeamMemberDto expectedTeamMember,
+      final TeamMemberDto actualTeamMember) {
+    Assertions.assertEquals(expectedTeamMember.id(), actualTeamMember.id());
+    Assertions.assertEquals(expectedTeamMember.position(), actualTeamMember.position());
+    Assertions.assertEquals(expectedTeamMember.numberOfTeamMembers(),
+        actualTeamMember.numberOfTeamMembers());
+  }
+
+  public static void assertRatesAreEqual(final RateDto expectedRateDto,
+      final RateDto actualRateDto) {
+    Assertions.assertEquals(expectedRateDto.id(), actualRateDto.id());
+    Assertions.assertEquals(expectedRateDto.position(), actualRateDto.position());
+    Assertions.assertEquals(expectedRateDto.rublesPerHour(), actualRateDto.rublesPerHour());
   }
 }

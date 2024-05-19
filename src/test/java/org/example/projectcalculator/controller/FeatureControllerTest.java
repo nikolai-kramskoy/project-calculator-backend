@@ -2,6 +2,7 @@ package org.example.projectcalculator.controller;
 
 import static org.example.projectcalculator.utility.Asserter.assertFeaturesAreEqual;
 import static org.example.projectcalculator.utility.Asserter.assertValidationError;
+import static org.example.projectcalculator.utility.TestingData.FEATURE_MAPPER;
 import static org.example.projectcalculator.utility.TestingData.createFeature1;
 import static org.example.projectcalculator.utility.TestingData.createFeature2;
 import static org.example.projectcalculator.utility.TestingData.createMilestone1;
@@ -22,7 +23,6 @@ import org.example.projectcalculator.controller.utility.JsonConverter;
 import org.example.projectcalculator.dto.FeatureDto;
 import org.example.projectcalculator.dto.error.ErrorDtoResponse;
 import org.example.projectcalculator.dto.request.CreateFeatureDtoRequest;
-import org.example.projectcalculator.mapper.FeatureMapper;
 import org.example.projectcalculator.model.Feature;
 import org.example.projectcalculator.service.FeatureService;
 import org.junit.jupiter.api.Assertions;
@@ -30,24 +30,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(FeatureController.class)
-@ComponentScan(basePackageClasses = FeatureMapper.class)
 @WithMockUser
 class FeatureControllerTest {
 
-  private static final String FEATURE_API_URL = "/projects/{projectId}/features";
-  private static final String SPECIFIC_FEATURE_API_URL = FEATURE_API_URL + "/{featureId}";
+  private static final String FEATURES_API_URL = "/projects/{projectId}/features";
+  private static final String SPECIFIC_FEATURE_API_URL = FEATURES_API_URL + "/{featureId}";
 
   @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
-  private FeatureMapper featureMapper;
 
   @MockBean
   private FeatureService featureServiceMock;
@@ -58,8 +53,8 @@ class FeatureControllerTest {
     final var project = createProject(creator);
     final var milestone = createMilestone1(project);
     final var feature = createFeature1(project, milestone);
-    final var createFeatureDtoRequest = featureMapper.toCreateFeatureDtoRequest(feature);
-    final var expectedFeatureDto = featureMapper.toFeatureDto(feature);
+    final var createFeatureDtoRequest = FEATURE_MAPPER.toCreateFeatureDtoRequest(feature);
+    final var expectedFeatureDto = FEATURE_MAPPER.toFeatureDto(feature);
 
     when(featureServiceMock.saveFeature(createFeatureDtoRequest, project.getId())).thenReturn(
         expectedFeatureDto);
@@ -67,7 +62,7 @@ class FeatureControllerTest {
     final var mvcResult =
         mockMvc
             .perform(
-                post(FEATURE_API_URL, project.getId())
+                post(FEATURES_API_URL, project.getId())
                     .with(csrf())
                     .characterEncoding(StandardCharsets.UTF_8)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +93,7 @@ class FeatureControllerTest {
     final var mvcResult =
         mockMvc
             .perform(
-                post(FEATURE_API_URL, 0L)
+                post(FEATURES_API_URL, 0L)
                     .with(csrf())
                     .characterEncoding(StandardCharsets.UTF_8)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -151,14 +146,75 @@ class FeatureControllerTest {
   }
 
   @Test
+  void testGetAllFeaturesWithMilestoneId_validArguments_returnList() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var milestone = createMilestone1(project);
+    final var feature1 = createFeature1(project, milestone);
+    final var feature2 = createFeature2(project, null);
+    final var expectedFeatureDtos = List.of(FEATURE_MAPPER.toFeatureDto(feature1),
+        FEATURE_MAPPER.toFeatureDto(feature2));
+
+    when(featureServiceMock.getAllFeatures(project.getId(), milestone.getId())).thenReturn(
+        Collections.singletonList(expectedFeatureDtos.get(0)));
+
+    final var mvcResult =
+        mockMvc
+            .perform(
+                get(FEATURES_API_URL, project.getId())
+                    .param("milestoneId", String.valueOf(milestone.getId()))
+                    .with(csrf())
+                    .characterEncoding(StandardCharsets.UTF_8))
+            .andReturn();
+
+    final var response = mvcResult.getResponse();
+
+    Assertions.assertEquals(200, response.getStatus());
+
+    final var actualFeatureDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
+        FeatureDto.class);
+
+    Assertions.assertEquals(1, actualFeatureDtos.size());
+  }
+
+  @Test
+  void testGetAllFeaturesWithoutMilestoneId_validArguments_returnList() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var feature1 = createFeature1(project, null);
+    final var feature2 = createFeature2(project, null);
+    final var expectedFeatureDtos = List.of(FEATURE_MAPPER.toFeatureDto(feature1),
+        FEATURE_MAPPER.toFeatureDto(feature2));
+
+    when(featureServiceMock.getAllFeatures(project.getId(), null)).thenReturn(expectedFeatureDtos);
+
+    final var mvcResult =
+        mockMvc
+            .perform(
+                get(FEATURES_API_URL, project.getId())
+                    .with(csrf())
+                    .characterEncoding(StandardCharsets.UTF_8))
+            .andReturn();
+
+    final var response = mvcResult.getResponse();
+
+    Assertions.assertEquals(200, response.getStatus());
+
+    final var actualFeatureDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
+        FeatureDto.class);
+
+    Assertions.assertEquals(2, actualFeatureDtos.size());
+  }
+
+  @Test
   void testUpdateFeature_validFeature_returnFeatureDto() throws Exception {
     final var creator = createUser();
     final var project = createProject(creator);
     final var feature = createFeature1(project, null);
     final var updatedFeature = createUpdatedFeature(feature);
-    final var updateFeatureDtoRequest = featureMapper.toUpdateFeatureDtoRequest(updatedFeature,
+    final var updateFeatureDtoRequest = FEATURE_MAPPER.toUpdateFeatureDtoRequest(updatedFeature,
         null);
-    final var expectedFeatureDto = featureMapper.toFeatureDto(updatedFeature);
+    final var expectedFeatureDto = FEATURE_MAPPER.toFeatureDto(updatedFeature);
 
     when(featureServiceMock.updateFeature(updateFeatureDtoRequest, project.getId(),
         feature.getId())).thenReturn(expectedFeatureDto);
@@ -191,9 +247,9 @@ class FeatureControllerTest {
     final var newMilestone = createMilestone2(project);
     final var feature = createFeature1(project, oldMilestone);
     final var updatedFeature = createUpdatedFeature(feature);
-    final var updateFeatureDtoRequest = featureMapper.toUpdateFeatureDtoRequest(updatedFeature,
+    final var updateFeatureDtoRequest = FEATURE_MAPPER.toUpdateFeatureDtoRequest(updatedFeature,
         newMilestone.getId());
-    final var expectedFeatureDto = featureMapper.toFeatureDto(updatedFeature);
+    final var expectedFeatureDto = FEATURE_MAPPER.toFeatureDto(updatedFeature);
 
     when(featureServiceMock.updateFeature(updateFeatureDtoRequest, project.getId(),
         feature.getId())).thenReturn(expectedFeatureDto);
@@ -218,73 +274,12 @@ class FeatureControllerTest {
     assertFeaturesAreEqual(expectedFeatureDto, actualFeatureDto);
   }
 
-  @Test
-  void testGetAllFeaturesWithMilestoneId_validArguments_returnList() throws Exception {
-    final var creator = createUser();
-    final var project = createProject(creator);
-    final var milestone = createMilestone1(project);
-    final var feature1 = createFeature1(project, milestone);
-    final var feature2 = createFeature2(project, null);
-    final var expectedFeatureDtos = List.of(featureMapper.toFeatureDto(feature1),
-        featureMapper.toFeatureDto(feature2));
-
-    when(featureServiceMock.getAllFeatures(project.getId(), milestone.getId())).thenReturn(
-        Collections.singletonList(expectedFeatureDtos.get(0)));
-
-    final var mvcResult =
-        mockMvc
-            .perform(
-                get(FEATURE_API_URL, project.getId())
-                    .param("milestoneId", String.valueOf(milestone.getId()))
-                    .with(csrf())
-                    .characterEncoding(StandardCharsets.UTF_8))
-            .andReturn();
-
-    final var response = mvcResult.getResponse();
-
-    Assertions.assertEquals(200, response.getStatus());
-
-    final var actualFeatureDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
-        FeatureDto.class);
-
-    Assertions.assertEquals(1, actualFeatureDtos.size());
-  }
-
-  @Test
-  void testGetAllFeaturesWithoutMilestoneId_validArguments_returnList() throws Exception {
-    final var creator = createUser();
-    final var project = createProject(creator);
-    final var feature1 = createFeature1(project, null);
-    final var feature2 = createFeature2(project, null);
-    final var expectedFeatureDtos = List.of(featureMapper.toFeatureDto(feature1),
-        featureMapper.toFeatureDto(feature2));
-
-    when(featureServiceMock.getAllFeatures(project.getId(), null)).thenReturn(expectedFeatureDtos);
-
-    final var mvcResult =
-        mockMvc
-            .perform(
-                get(FEATURE_API_URL, project.getId())
-                    .with(csrf())
-                    .characterEncoding(StandardCharsets.UTF_8))
-            .andReturn();
-
-    final var response = mvcResult.getResponse();
-
-    Assertions.assertEquals(200, response.getStatus());
-
-    final var actualFeatureDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
-        FeatureDto.class);
-
-    Assertions.assertEquals(2, actualFeatureDtos.size());
-  }
-
   private void assertFeatureEstimatesValidationFail(
       final CreateFeatureDtoRequest createFeatureDtoRequest) throws Exception {
     final var mvcResult =
         mockMvc
             .perform(
-                post(FEATURE_API_URL, 1L)
+                post(FEATURES_API_URL, 1L)
                     .with(csrf())
                     .characterEncoding(StandardCharsets.UTF_8)
                     .contentType(MediaType.APPLICATION_JSON)

@@ -2,6 +2,7 @@ package org.example.projectcalculator.controller;
 
 import static org.example.projectcalculator.utility.Asserter.assertMilestonesAreEqual;
 import static org.example.projectcalculator.utility.Asserter.assertValidationError;
+import static org.example.projectcalculator.utility.TestingData.MILESTONE_MAPPER;
 import static org.example.projectcalculator.utility.TestingData.NOW;
 import static org.example.projectcalculator.utility.TestingData.createMilestone1;
 import static org.example.projectcalculator.utility.TestingData.createMilestone2;
@@ -22,32 +23,25 @@ import org.example.projectcalculator.dto.MilestoneDto;
 import org.example.projectcalculator.dto.error.ErrorDtoResponse;
 import org.example.projectcalculator.dto.request.CreateUpdateMilestoneDtoRequest;
 import org.example.projectcalculator.dto.request.validation.annotation.MilestoneDates;
-import org.example.projectcalculator.mapper.MilestoneMapper;
 import org.example.projectcalculator.service.MilestoneService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(MilestoneController.class)
-@ComponentScan(basePackageClasses = MilestoneMapper.class)
 @WithMockUser
 class MilestoneControllerTest {
 
-  private static final String PROJECT_API_URL = "/projects";
-  private static final String MILESTONE_API_URL = PROJECT_API_URL + "/{projectId}/milestones";
-  private static final String SPECIFIC_MILESTONE_API_URL = MILESTONE_API_URL + "/{milestoneId}";
+  private static final String MILESTONES_API_URL = "/projects/{projectId}/milestones";
+  private static final String SPECIFIC_MILESTONE_API_URL = MILESTONES_API_URL + "/{milestoneId}";
 
   @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
-  private MilestoneMapper milestoneMapper;
 
   @MockBean
   private MilestoneService milestoneServiceMock;
@@ -57,9 +51,9 @@ class MilestoneControllerTest {
     final var creator = createUser();
     final var project = createProject(creator);
     final var milestone = createMilestone1(project);
-    final var createMilestoneDtoRequest = milestoneMapper.toCreateUpdateMilestoneDtoRequest(
+    final var createMilestoneDtoRequest = MILESTONE_MAPPER.toCreateUpdateMilestoneDtoRequest(
         milestone);
-    final var expectedMilestoneDto = milestoneMapper.toMilestoneDto(milestone);
+    final var expectedMilestoneDto = MILESTONE_MAPPER.toMilestoneDto(milestone);
 
     when(milestoneServiceMock.saveMilestone(createMilestoneDtoRequest, project.getId())).thenReturn(
         expectedMilestoneDto);
@@ -67,7 +61,7 @@ class MilestoneControllerTest {
     final var mvcResult =
         mockMvc
             .perform(
-                post(MILESTONE_API_URL, project.getId())
+                post(MILESTONES_API_URL, project.getId())
                     .with(csrf())
                     .characterEncoding(StandardCharsets.UTF_8)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -92,14 +86,12 @@ class MilestoneControllerTest {
     final var mvcResult =
         mockMvc
             .perform(
-                post(MILESTONE_API_URL, 1L)
+                post(MILESTONES_API_URL, 1L)
                     .with(csrf())
                     .characterEncoding(StandardCharsets.UTF_8)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(JsonConverter.objectToJson(createUpdateMilestoneDtoRequest)))
             .andReturn();
-
-    // Assert
 
     final var response = mvcResult.getResponse();
 
@@ -134,7 +126,7 @@ class MilestoneControllerTest {
     final var mvcResult =
         mockMvc
             .perform(
-                post(MILESTONE_API_URL, 0L)
+                post(MILESTONES_API_URL, 0L)
                     .with(csrf())
                     .characterEncoding(StandardCharsets.UTF_8)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -157,13 +149,42 @@ class MilestoneControllerTest {
   }
 
   @Test
+  void testGetAllMilestones_validArguments_returnList() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var expectedMilestoneDtos =
+        List.of(
+            MILESTONE_MAPPER.toMilestoneDto(createMilestone1(project)),
+            MILESTONE_MAPPER.toMilestoneDto(createMilestone2(project)));
+
+    when(milestoneServiceMock.getAllMilestones(project.getId())).thenReturn(expectedMilestoneDtos);
+
+    final var mvcResult =
+        mockMvc
+            .perform(
+                get(MILESTONES_API_URL, project.getId())
+                    .with(csrf())
+                    .characterEncoding(StandardCharsets.UTF_8))
+            .andReturn();
+
+    final var response = mvcResult.getResponse();
+
+    Assertions.assertEquals(200, response.getStatus());
+
+    final var actualMilestoneDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
+        MilestoneDto.class);
+
+    Assertions.assertEquals(2, actualMilestoneDtos.size());
+  }
+
+  @Test
   void testUpdateMilestone_validMilestone_returnMilestoneDto() throws Exception {
     final var creator = createUser();
     final var project = createProject(creator);
     final var updatedMilestone = createMilestone1(project);
-    final var updateMilestoneDtoRequest = milestoneMapper.toCreateUpdateMilestoneDtoRequest(
+    final var updateMilestoneDtoRequest = MILESTONE_MAPPER.toCreateUpdateMilestoneDtoRequest(
         updatedMilestone);
-    final var expectedMilestoneDto = milestoneMapper.toMilestoneDto(updatedMilestone);
+    final var expectedMilestoneDto = MILESTONE_MAPPER.toMilestoneDto(updatedMilestone);
 
     when(milestoneServiceMock.updateMilestone(updateMilestoneDtoRequest, project.getId(),
         updatedMilestone.getId())).thenReturn(expectedMilestoneDto);
@@ -193,8 +214,6 @@ class MilestoneControllerTest {
     final long projectId = 1L;
     final long milestoneId = 1L;
 
-    // no need to set projectService's behavior
-
     final var mvcResult =
         mockMvc
             .perform(
@@ -207,34 +226,5 @@ class MilestoneControllerTest {
 
     Assertions.assertEquals(200, response.getStatus());
     Assertions.assertEquals(0, response.getContentLength());
-  }
-
-  @Test
-  void testGetAllMilestones_validArguments_returnList() throws Exception {
-    final var creator = createUser();
-    final var project = createProject(creator);
-    final var expectedMilestoneDtos =
-        List.of(
-            milestoneMapper.toMilestoneDto(createMilestone1(project)),
-            milestoneMapper.toMilestoneDto(createMilestone2(project)));
-
-    when(milestoneServiceMock.getAllMilestones(project.getId())).thenReturn(expectedMilestoneDtos);
-
-    final var mvcResult =
-        mockMvc
-            .perform(
-                get(MILESTONE_API_URL, project.getId())
-                    .with(csrf())
-                    .characterEncoding(StandardCharsets.UTF_8))
-            .andReturn();
-
-    final var response = mvcResult.getResponse();
-
-    Assertions.assertEquals(200, response.getStatus());
-
-    final var actualMilestoneDtos = JsonConverter.jsonToListOfObjects(response.getContentAsString(),
-        MilestoneDto.class);
-
-    Assertions.assertEquals(2, actualMilestoneDtos.size());
   }
 }

@@ -4,6 +4,7 @@ import static org.example.projectcalculator.controller.utility.JsonConverter.jso
 import static org.example.projectcalculator.controller.utility.JsonConverter.objectToJson;
 import static org.example.projectcalculator.utility.Asserter.assertUsersAreEqual;
 import static org.example.projectcalculator.utility.Asserter.assertValidationError;
+import static org.example.projectcalculator.utility.TestingData.USER_MAPPER;
 import static org.example.projectcalculator.utility.TestingData.createUser;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -14,30 +15,24 @@ import javax.validation.constraints.NotBlank;
 import org.example.projectcalculator.dto.UserDto;
 import org.example.projectcalculator.dto.error.ErrorDtoResponse;
 import org.example.projectcalculator.dto.request.CreateUserDtoRequest;
-import org.example.projectcalculator.mapper.UserMapper;
 import org.example.projectcalculator.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(UserController.class)
-@ComponentScan(basePackageClasses = UserMapper.class)
 @WithMockUser
 class UserControllerTest {
 
-  private static final String USER_API_URL = "/users";
+  private static final String USERS_API_URL = "/users";
 
   @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
-  private UserMapper userMapper;
 
   @MockBean
   private UserService userServiceMock;
@@ -45,15 +40,15 @@ class UserControllerTest {
   @Test
   void testCreateUser_validUser_returnUserDto() throws Exception {
     final var user = createUser();
-    final var createUserDtoRequest = userMapper.toCreateUserDtoRequest(user, "qwerty123");
-    final var expectedUserDto = userMapper.toUserDto(user);
+    final var createUserDtoRequest = USER_MAPPER.toCreateUserDtoRequest(user, "qwerty123");
+    final var expectedUserDto = USER_MAPPER.toUserDto(user);
 
     when(userServiceMock.saveUser(createUserDtoRequest)).thenReturn(expectedUserDto);
 
     final var mvcResult =
         mockMvc
             .perform(
-                post(USER_API_URL)
+                post(USERS_API_URL)
                     .with(csrf())
                     .characterEncoding(StandardCharsets.UTF_8)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -76,7 +71,7 @@ class UserControllerTest {
     final var mvcResult =
         mockMvc
             .perform(
-                post(USER_API_URL)
+                post(USERS_API_URL)
                     .with(csrf())
                     .characterEncoding(StandardCharsets.UTF_8)
                     .contentType(MediaType.APPLICATION_JSON)

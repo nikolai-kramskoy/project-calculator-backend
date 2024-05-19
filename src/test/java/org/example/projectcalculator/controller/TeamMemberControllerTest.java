@@ -1,9 +1,12 @@
 package org.example.projectcalculator.controller;
 
+import static org.example.projectcalculator.utility.Asserter.assertTeamMembersAreEqual;
+import static org.example.projectcalculator.utility.TestingData.TEAM_MEMBER_MAPPER;
+import static org.example.projectcalculator.utility.TestingData.createProject;
+import static org.example.projectcalculator.utility.TestingData.createTeamMember;
+import static org.example.projectcalculator.utility.TestingData.createUser;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -11,196 +14,146 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.example.projectcalculator.controller.utility.JsonConverter;
+import org.example.projectcalculator.dto.MilestoneDto;
 import org.example.projectcalculator.dto.TeamMemberDto;
-import org.example.projectcalculator.dto.error.ErrorDto;
-import org.example.projectcalculator.dto.error.ErrorDtoResponse;
-import org.example.projectcalculator.dto.request.CreateUpdateTeamMemberDtoRequest;
-import org.example.projectcalculator.mapper.TeamMemberMapper;
-import org.example.projectcalculator.model.Position;
-import org.example.projectcalculator.model.TeamMember;
 import org.example.projectcalculator.service.TeamMemberService;
-import org.example.projectcalculator.utility.TestingData;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(TeamMemberController.class)
-@ComponentScan(basePackageClasses = TeamMemberMapper.class)
 @WithMockUser
 class TeamMemberControllerTest {
 
-  public static final long projectId = 1L;
-  private static final long memberId = 23L;
-  private static final String PROJECT_API_URL = "/projects";
-  private static final String TEAM_API_URL = PROJECT_API_URL + "/" + projectId + "/team-members";
-  private static final String SPECIFIC_TEAM_API_URL = TEAM_API_URL + "/" + memberId;
-  private static final BigDecimal NUMBER_OF_TEAM_MEMBERS = new BigDecimal("1.75");
+  private static final String TEAM_MEMBERS_API_URL = "/projects/{projectId}/team-members";
+  private static final String SPECIFIC_TEAM_MEMBER_API_URL = TEAM_MEMBERS_API_URL + "/{memberId}";
 
   @Autowired
   protected MockMvc mockMvc;
 
-  @Autowired
-  private TeamMemberMapper teamMemberMapper;
-
   @MockBean
-  private TeamMemberService teamMemberService;
+  private TeamMemberService teamMemberServiceMock;
 
   @Test
-  void testCreateSuccessful() throws Exception {
-    final var creator = TestingData.createUser();
-    final var project = TestingData.createProject(creator);
+  void testCreateTeamMember_validTeamMember_returnTeamMemberDto() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var teamMember = createTeamMember(project);
+    final var createTeamMemberDtoRequest = TEAM_MEMBER_MAPPER.toCreateUpdateTeamMemberDtoRequest(
+        teamMember);
+    final var expectedTeamMemberDto = TEAM_MEMBER_MAPPER.toTeamDto(teamMember);
 
-    final var request =
-        new CreateUpdateTeamMemberDtoRequest(Position.DEVOPS_ENGINEER.name(),
-            NUMBER_OF_TEAM_MEMBERS);
+    when(teamMemberServiceMock.saveTeamMember(createTeamMemberDtoRequest,
+        project.getId())).thenReturn(expectedTeamMemberDto);
 
-    final var teamMember = createTeamMember();
-    final var expectedTeamMemberDto = teamMemberMapper.toTeamDto(teamMember);
+    final var mvcResult =
+        mockMvc
+            .perform(
+                post(TEAM_MEMBERS_API_URL, project.getId())
+                    .with(csrf())
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(JsonConverter.objectToJson(createTeamMemberDtoRequest)))
+            .andReturn();
 
-    when(teamMemberService.saveTeamMember(request, project.getId())).thenReturn(
-        expectedTeamMemberDto);
+    final var response = mvcResult.getResponse();
 
-    final var result = mockMvc.perform(post(TEAM_API_URL, project.getId())
-            .with(csrf())
-            .characterEncoding(StandardCharsets.UTF_8)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(JsonConverter.objectToJson(request)))
-        .andReturn();
+    Assertions.assertEquals(200, response.getStatus());
 
-    final var teamMemberDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
+    final var actualTeamMemberDto = JsonConverter.jsonToObject(
+        mvcResult.getResponse().getContentAsString(),
         TeamMemberDto.class);
 
-    assertAll(
-        () -> assertEquals(200, result.getResponse().getStatus()),
-        () -> assertTrue(teamMemberDto.id() > 0),
-        () -> assertEquals(teamMember.getPosition().name(), teamMemberDto.position()),
-        () -> assertEquals(teamMember.getNumberOfTeamMembers(), teamMemberDto.numberOfTeamMembers())
-    );
+    assertTeamMembersAreEqual(expectedTeamMemberDto, actualTeamMemberDto);
   }
 
   @Test
-  void testCreateFailureByAllRequestFields() throws Exception {
-    final var numberOfTeamMembers = new BigDecimal("-2.25");
-    final var request = new CreateUpdateTeamMemberDtoRequest(null, numberOfTeamMembers);
+  void testUpdateTeamMember_validTeamMember_returnTeamMemberDto() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var teamMember = createTeamMember(project);
+    final var updateTeamMemberDtoRequest = TEAM_MEMBER_MAPPER.toCreateUpdateTeamMemberDtoRequest(
+        teamMember);
+    final var expectedTeamMemberDto = TEAM_MEMBER_MAPPER.toTeamDto(teamMember);
 
-    final var result = mockMvc.perform(post(TEAM_API_URL)
-            .with(csrf())
-            .characterEncoding(StandardCharsets.UTF_8)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(JsonConverter.objectToJson(request)))
-        .andReturn();
-
-    final var response = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
-        ErrorDtoResponse.class);
-
-    assertAll(
-        () -> assertEquals(400, result.getResponse().getStatus()),
-        () -> assertEquals(2, response.errors().size())
-    );
-  }
-
-  @Test
-  void testUpdateSuccessful() throws Exception {
-    final var teamMember = createTeamMember();
-    final var request = new CreateUpdateTeamMemberDtoRequest(teamMember.getPosition().name(),
-        NUMBER_OF_TEAM_MEMBERS);
-    final var expectedTeamMemberDto = teamMemberMapper.toTeamDto(teamMember);
-
-    when(teamMemberService.updateTeamMember(request, teamMember.getProject().getId(),
+    when(teamMemberServiceMock.updateTeamMember(updateTeamMemberDtoRequest, project.getId(),
         teamMember.getId())).thenReturn(expectedTeamMemberDto);
 
-    final var result = mockMvc.perform(put(SPECIFIC_TEAM_API_URL)
-            .with(csrf())
-            .characterEncoding(StandardCharsets.UTF_8)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(JsonConverter.objectToJson(request)))
-        .andReturn();
+    final var mvcResult =
+        mockMvc
+            .perform(
+                put(SPECIFIC_TEAM_MEMBER_API_URL, project.getId(), teamMember.getId())
+                    .with(csrf())
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(JsonConverter.objectToJson(updateTeamMemberDtoRequest)))
+            .andReturn();
 
-    final var teamMemberDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
+    final var response = mvcResult.getResponse();
+
+    Assertions.assertEquals(200, response.getStatus());
+
+    final var actualTeamMemberDto = JsonConverter.jsonToObject(
+        mvcResult.getResponse().getContentAsString(),
         TeamMemberDto.class);
 
-    assertAll(
-        () -> assertEquals(200, result.getResponse().getStatus()),
-        () -> assertTrue(teamMemberDto.id() > 0),
-        () -> assertEquals(teamMember.getPosition().name(), teamMemberDto.position()),
-        () -> assertEquals(teamMember.getNumberOfTeamMembers(), teamMemberDto.numberOfTeamMembers())
-    );
+    assertTeamMembersAreEqual(expectedTeamMemberDto, actualTeamMemberDto);
   }
 
   @Test
-  void testUpdateFailure() throws Exception {
-    final var numberOfTeamMembers = new BigDecimal("-2.25");
-    final var request = new CreateUpdateTeamMemberDtoRequest(null, numberOfTeamMembers);
+  void testGetAllTeamMembers_validArguments_returnList() throws Exception {
+    final var creator = createUser();
+    final var project = createProject(creator);
+    final var expectedTeamMemberDtos =
+        List.of(
+            TEAM_MEMBER_MAPPER.toTeamDto(createTeamMember(project)));
 
-    final var result = mockMvc.perform(put(SPECIFIC_TEAM_API_URL)
-            .with(csrf())
-            .characterEncoding(StandardCharsets.UTF_8)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(JsonConverter.objectToJson(request)))
-        .andReturn();
+    when(teamMemberServiceMock.getAllTeamMembers(project.getId())).thenReturn(
+        expectedTeamMemberDtos);
 
-    final var errorDto = JsonConverter.jsonToObject(result.getResponse().getContentAsString(),
-        ErrorDto.class);
+    final var mvcResult =
+        mockMvc
+            .perform(
+                get(TEAM_MEMBERS_API_URL, project.getId())
+                    .with(csrf())
+                    .characterEncoding(StandardCharsets.UTF_8))
+            .andReturn();
 
-    assertAll(
-        () -> assertEquals(400, result.getResponse().getStatus()),
-        () -> assertNotNull(errorDto.errorCode()),
-        () -> assertNotNull(errorDto.errorMessage()),
-        () -> assertNotNull(errorDto.fieldWithError())
-    );
+    final var response = mvcResult.getResponse();
+
+    Assertions.assertEquals(200, response.getStatus());
+
+    final var actualTeamMemberDtos = JsonConverter.jsonToListOfObjects(
+        response.getContentAsString(), MilestoneDto.class);
+
+    Assertions.assertEquals(1, actualTeamMemberDtos.size());
   }
 
   @Test
-  void testGetSuccessful() throws Exception {
-    final var creator = TestingData.createUser();
-    final var project = TestingData.createProject(creator);
-    final var teamMember = createTeamMember();
-    final var request = new CreateUpdateTeamMemberDtoRequest(teamMember.getPosition().name(),
-        teamMember.getNumberOfTeamMembers());
+  void testDeleteTeamMember_validTeamMember_returnTeamMemberDto() throws Exception {
+    final long projectId = 1L;
+    final long teamMemberId = 1L;
 
-    final var result = mockMvc.perform(get(TEAM_API_URL, project.getId())
-            .with(csrf())
-            .characterEncoding(StandardCharsets.UTF_8)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(JsonConverter.objectToJson(request)))
-        .andReturn();
-
-    final var teamMemberDtos = JsonConverter.jsonToListOfObjects(
-        result.getResponse().getContentAsString(), TeamMemberDto.class);
+    final var mvcResult =
+        mockMvc
+            .perform(
+                delete(SPECIFIC_TEAM_MEMBER_API_URL, projectId, teamMemberId)
+                    .with(csrf())
+                    .characterEncoding(StandardCharsets.UTF_8)
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
 
     assertAll(
-        () -> assertEquals(200, result.getResponse().getStatus()),
-        () -> assertEquals(0, teamMemberDtos.size())
+        () -> assertEquals(200, mvcResult.getResponse().getStatus()),
+        () -> assertEquals(0, mvcResult.getResponse().getContentLength())
     );
-  }
-
-  @Test
-  void testDeleteSuccessful() throws Exception {
-    final var result = mockMvc.perform(delete(SPECIFIC_TEAM_API_URL, projectId, memberId)
-            .with(csrf())
-            .characterEncoding(StandardCharsets.UTF_8)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andReturn();
-
-    assertAll(
-        () -> assertEquals(200, result.getResponse().getStatus()),
-        () -> assertEquals(0, result.getResponse().getContentLength())
-    );
-  }
-
-  private TeamMember createTeamMember() {
-    return new TeamMember(
-        memberId,
-        Position.SENIOR_DEVELOPER,
-        NUMBER_OF_TEAM_MEMBERS,
-        TestingData.createProject(TestingData.createUser()));
   }
 }

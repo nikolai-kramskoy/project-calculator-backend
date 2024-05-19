@@ -51,7 +51,7 @@ public class UserService {
 
     final var now = LocalDateTime.now(clock);
 
-    final User user = userRepository.save(
+    final var user = userRepository.save(
         userMapper.toUser(request, passwordEncoder.encode(request.password()), now, now));
 
     log.info("Saved {}", user);
@@ -66,7 +66,7 @@ public class UserService {
    */
   @Transactional(readOnly = true)
   public UserDto getAuthenticatedUser() {
-    final User user = getCurrentlyAuthenticatedUser();
+    final var user = getCurrentlyAuthenticatedUser();
 
     log.info("Get authenticated User: {}", user);
 
@@ -85,7 +85,7 @@ public class UserService {
    */
   @Transactional
   public UserDto updateUser(final UpdateUserDtoRequest request, final long userId) {
-    final User user = getCurrentlyAuthenticatedUser();
+    final var user = getCurrentlyAuthenticatedUser();
 
     if (user.getId() != userId) {
       throw new ProjectCalculatorException(ProjectCalculatorError.USER_IS_NOT_FOUND_BY_ID,

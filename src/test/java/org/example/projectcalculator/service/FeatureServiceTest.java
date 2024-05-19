@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import org.example.projectcalculator.model.Feature;
 import org.example.projectcalculator.repository.FeatureRepository;
-import org.example.projectcalculator.repository.RateRepository;
-import org.example.projectcalculator.repository.TeamMemberRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,8 +31,6 @@ class FeatureServiceTest {
   private PriceService priceServiceMock;
 
   private FeatureRepository featureRepositoryMock;
-  private RateRepository rateRepositoryMock;
-  private TeamMemberRepository teamMemberRepositoryMock;
 
   private FeatureService featureService;
 
@@ -46,8 +42,6 @@ class FeatureServiceTest {
     priceServiceMock = mock(PriceService.class);
 
     featureRepositoryMock = mock(FeatureRepository.class);
-    rateRepositoryMock = mock(RateRepository.class);
-    teamMemberRepositoryMock = mock(TeamMemberRepository.class);
 
     featureService =
         new FeatureService(
@@ -56,8 +50,6 @@ class FeatureServiceTest {
             milestoneServiceMock,
             priceServiceMock,
             featureRepositoryMock,
-            rateRepositoryMock,
-            teamMemberRepositoryMock,
             CLOCK,
             FEATURE_MAPPER);
   }

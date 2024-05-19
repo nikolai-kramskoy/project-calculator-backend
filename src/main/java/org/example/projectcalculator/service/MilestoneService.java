@@ -13,7 +13,6 @@ import org.example.projectcalculator.error.ProjectCalculatorException;
 import org.example.projectcalculator.mapper.MilestoneMapper;
 import org.example.projectcalculator.model.Milestone;
 import org.example.projectcalculator.model.Project;
-import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.MilestoneRepository;
 import org.example.projectcalculator.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
@@ -54,14 +53,14 @@ public class MilestoneService {
   @Transactional
   public MilestoneDto saveMilestone(
       final CreateUpdateMilestoneDtoRequest request, final long projectId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
     final var now = LocalDateTime.now(clock);
 
-    final Milestone milestone =
+    final var milestone =
         milestoneRepository.save(
             milestoneMapper.toMilestone(request, project, now, now, BigDecimal.ZERO));
 
@@ -82,12 +81,12 @@ public class MilestoneService {
    */
   @Transactional(readOnly = true)
   public List<MilestoneDto> getAllMilestones(final long projectId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final List<Milestone> milestones = milestoneRepository.findAllByProjectId(projectId);
+    final var milestones = milestoneRepository.findAllByProjectId(projectId);
 
     log.info("Get List<Milestone> by projectId = {}: {}", projectId, milestones);
 
@@ -113,12 +112,12 @@ public class MilestoneService {
   @Transactional
   public MilestoneDto updateMilestone(
       final CreateUpdateMilestoneDtoRequest request, final long projectId, final long milestoneId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final Milestone milestone = getMilestone(projectId, milestoneId);
+    final var milestone = getMilestone(projectId, milestoneId);
     final var now = LocalDateTime.now(clock);
 
     log.info("Before update {}", milestone);
@@ -148,16 +147,19 @@ public class MilestoneService {
    */
   @Transactional
   public void deleteMilestone(final long projectId, final long milestoneId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final Milestone milestone = getMilestone(projectId, milestoneId);
+    final var milestone = getMilestone(projectId, milestoneId);
 
     log.info("Trying to delete {}", milestone);
 
     project.setLastUpdatedAt(LocalDateTime.now(clock));
+
+    // I probably also need to change lastUpdatedAt of all the features
+    // of the milestone...
 
     milestoneRepository.delete(milestone);
 

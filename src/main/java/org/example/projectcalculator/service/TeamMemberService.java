@@ -14,7 +14,6 @@ import org.example.projectcalculator.mapper.TeamMemberMapper;
 import org.example.projectcalculator.model.Position;
 import org.example.projectcalculator.model.Project;
 import org.example.projectcalculator.model.TeamMember;
-import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.ProjectRepository;
 import org.example.projectcalculator.repository.TeamMemberRepository;
 import org.springframework.stereotype.Service;
@@ -54,17 +53,16 @@ public class TeamMemberService {
       final long projectId) {
     checkIfStringIsValidPosition(request.position());
 
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final List<TeamMember> teamMembers = teamMemberRepository.findAllByProjectId(projectId);
+    final var teamMembers = teamMemberRepository.findAllByProjectId(projectId);
 
     checkIfTeamMemberAlreadyExists(teamMembers, request.position());
 
-    final TeamMember teamMember = teamMemberRepository.save(
-        teamMemberMapper.toTeam(request, project));
+    final var teamMember = teamMemberRepository.save(teamMemberMapper.toTeam(request, project));
 
     project.setLastUpdatedAt(LocalDateTime.now(clock));
 
@@ -83,16 +81,18 @@ public class TeamMemberService {
    */
   @Transactional(readOnly = true)
   public List<TeamMemberDto> getAllTeamMembers(final long projectId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final List<TeamMember> teamMembers = teamMemberRepository.findAllByProjectId(projectId);
+    final var teamMembers = teamMemberRepository.findAllByProjectId(projectId);
 
     log.info("Get List<TeamMember> by projectId = {}: {}", projectId, teamMembers);
 
-    return teamMembers.stream().map(teamMemberMapper::toTeamDto).toList();
+    return teamMembers.stream()
+        .map(teamMemberMapper::toTeamDto)
+        .toList();
   }
 
   /**
@@ -111,16 +111,16 @@ public class TeamMemberService {
       final long projectId, final long teamMemberId) {
     checkIfStringIsValidPosition(request.position());
 
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final List<TeamMember> teamMembers = teamMemberRepository.findAllByProjectId(projectId);
+    final var teamMembers = teamMemberRepository.findAllByProjectId(projectId);
 
     checkIfTeamMemberAlreadyExists(teamMembers, request.position());
 
-    final TeamMember teamMember = teamMembers.stream()
+    final var teamMember = teamMembers.stream()
         .filter(teamMemberLambda -> teamMemberLambda.getId() == teamMemberId)
         .findAny()
         .orElseThrow(() -> new ProjectCalculatorException(
@@ -150,7 +150,7 @@ public class TeamMemberService {
    */
   @Transactional
   public void deleteTeamMember(final long projectId, final long teamMemberId) {
-    final TeamMember teamMember = getTeamMember(projectId, teamMemberId);
+    final var teamMember = getTeamMember(projectId, teamMemberId);
 
     log.info("Trying to delete {}", teamMember);
 

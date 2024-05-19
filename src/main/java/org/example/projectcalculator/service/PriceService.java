@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PriceService {
 
+  private static final BigDecimal HOURS_IN_DAY = BigDecimal.valueOf(8);
+
   /**
    * Computes price in RUB based on {@code teamMembers} of given {@link Project} and
    * {@code estimateInDays} for all {@link Position}s.
@@ -35,9 +37,7 @@ public class PriceService {
         .map(position -> getPositionPrice(rates, teamMembers, position))
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    final var hoursInDay = BigDecimal.valueOf(8);
-
-    return estimateInDays.multiply(teamPrice).multiply(hoursInDay);
+    return estimateInDays.multiply(teamPrice).multiply(HOURS_IN_DAY);
   }
 
   /**

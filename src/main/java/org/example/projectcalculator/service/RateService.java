@@ -12,7 +12,6 @@ import org.example.projectcalculator.error.ProjectCalculatorException;
 import org.example.projectcalculator.mapper.RateMapper;
 import org.example.projectcalculator.model.Project;
 import org.example.projectcalculator.model.Rate;
-import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.ProjectRepository;
 import org.example.projectcalculator.repository.RateRepository;
 import org.springframework.stereotype.Service;
@@ -45,16 +44,18 @@ public class RateService {
    */
   @Transactional(readOnly = true)
   public List<RateDto> getAllRates(final long projectId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final List<Rate> rates = rateRepository.findAllByProjectId(projectId);
+    final var rates = rateRepository.findAllByProjectId(projectId);
 
     log.info("Get List<Rate> by projectId = {}: {}", projectId, rates);
 
-    return rates.stream().map(rateMapper::toRateDto).toList();
+    return rates.stream()
+        .map(rateMapper::toRateDto)
+        .toList();
   }
 
   /**
@@ -73,9 +74,9 @@ public class RateService {
   @Transactional
   public RateDto updateRate(final UpdateRateDtoRequest request, final long projectId,
       final long rateId) {
-    final Rate rate = getRate(projectId, rateId);
-    final Project project = rate.getProject();
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var rate = getRate(projectId, rateId);
+    final var project = rate.getProject();
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 

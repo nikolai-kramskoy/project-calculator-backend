@@ -18,10 +18,6 @@ project/milestone/feature.
 Typical CRUD operations are available for key models. User can view all his
 projects/milestones/features with estimates.
 
-Estimates are stored in the database, they're recomputed when any of the
-project components change and. This mechanism avoids time-consuming
-computations of estimates for all projects with each GET request.
-
 ## Usage
 
 This server is dependent only on single PostgreSQL instance.

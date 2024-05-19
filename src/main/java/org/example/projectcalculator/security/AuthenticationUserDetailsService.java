@@ -5,7 +5,6 @@ import static org.springframework.security.core.userdetails.User.withUsername;
 import java.util.Collections;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.UserRepository;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +27,7 @@ public class AuthenticationUserDetailsService implements UserDetailsService {
   public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
     log.info("trying to authenticate User with username == \"{}\"", username);
 
-    final User user =
+    final var user =
         userRepository
             .findByLogin(username)
             .orElseThrow(

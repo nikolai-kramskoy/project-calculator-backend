@@ -14,12 +14,9 @@ import org.example.projectcalculator.mapper.FeatureMapper;
 import org.example.projectcalculator.model.Feature;
 import org.example.projectcalculator.model.Milestone;
 import org.example.projectcalculator.model.Project;
-import org.example.projectcalculator.model.User;
 import org.example.projectcalculator.repository.FeatureRepository;
 import org.example.projectcalculator.repository.MilestoneRepository;
 import org.example.projectcalculator.repository.ProjectRepository;
-import org.example.projectcalculator.repository.RateRepository;
-import org.example.projectcalculator.repository.TeamMemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +34,6 @@ public class FeatureService {
   private final PriceService priceService;
 
   private final FeatureRepository featureRepository;
-  private final RateRepository rateRepository;
-  private final TeamMemberRepository teamMemberRepository;
 
   private final Clock clock;
 
@@ -62,17 +57,17 @@ public class FeatureService {
    */
   @Transactional
   public FeatureDto saveFeature(final CreateFeatureDtoRequest request, final long projectId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final Long milestoneId = request.getMilestoneId();
-    final Milestone milestone =
+    final var milestoneId = request.getMilestoneId();
+    final var milestone =
         (milestoneId != null) ? milestoneService.getMilestone(projectId, milestoneId) : null;
     final var now = LocalDateTime.now(clock);
 
-    final Feature feature =
+    final var feature =
         featureRepository.save(
             featureMapper.toFeature(request, project, milestone, now, now));
 
@@ -106,8 +101,8 @@ public class FeatureService {
    */
   @Transactional(readOnly = true)
   public List<FeatureDto> getAllFeatures(final long projectId, final Long milestoneId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
@@ -146,16 +141,16 @@ public class FeatureService {
   @Transactional
   public FeatureDto updateFeature(
       final UpdateFeatureDtoRequest request, final long projectId, final long featureId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final Feature feature = getFeature(projectId, featureId);
-    final Milestone oldMilestone = feature.getMilestone();
-    final Long oldMilestoneId = (oldMilestone != null) ? oldMilestone.getId() : null;
-    final Long newMilestoneId = request.getNewMilestoneId();
-    final Milestone newMilestone =
+    final var feature = getFeature(projectId, featureId);
+    final var oldMilestone = feature.getMilestone();
+    final var oldMilestoneId = (oldMilestone != null) ? oldMilestone.getId() : null;
+    final var newMilestoneId = request.getNewMilestoneId();
+    final var newMilestone =
         (newMilestoneId != null) ? milestoneService.getMilestone(projectId, newMilestoneId) : null;
 
     // we need to check if newMilestone belongs to the same project as the feature does
@@ -218,13 +213,13 @@ public class FeatureService {
    */
   @Transactional
   public void deleteFeature(final long projectId, final long featureId) {
-    final Project project = projectService.getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = projectService.getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     projectService.checkIfUserOwnsProject(user, project);
 
-    final Feature feature = getFeature(projectId, featureId);
-    final Milestone milestone = feature.getMilestone();
+    final var feature = getFeature(projectId, featureId);
+    final var milestone = feature.getMilestone();
 
     final var now = LocalDateTime.now(clock);
 

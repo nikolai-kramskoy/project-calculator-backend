@@ -51,17 +51,17 @@ public class ProjectService {
    */
   @Transactional
   public ProjectDto saveProject(final CreateUpdateProjectDtoRequest request) {
-    final User creator = userService.getCurrentlyAuthenticatedUser();
+    final var creator = userService.getCurrentlyAuthenticatedUser();
     final var now = LocalDateTime.now(clock);
 
-    final Project project = projectRepository.save(
+    final var project = projectRepository.save(
         projectMapper.toProject(request, creator, BigDecimal.ZERO, now, now));
 
     log.info("Create {}", project);
 
     // Create default rates for project
 
-    final List<Rate> rates = Arrays.stream(Position.values())
+    final var rates = Arrays.stream(Position.values())
         .map(position -> new Rate(0L, position, position.getDefaultRateInRublesPerHour(), project))
         .toList();
 
@@ -71,7 +71,7 @@ public class ProjectService {
 
     // Create default team members for project
 
-    final List<TeamMember> teamMembers = List.of(
+    final var teamMembers = List.of(
         new TeamMember(0L, Position.REGULAR_DEVELOPER, new BigDecimal("1"), project),
         new TeamMember(0L, Position.QA_ENGINEER, new BigDecimal("0.25"), project),
         new TeamMember(0L, Position.PROJECT_MANAGER, new BigDecimal("0.25"), project));
@@ -90,8 +90,8 @@ public class ProjectService {
    */
   @Transactional(readOnly = true)
   public List<ProjectDto> getAllProjects() {
-    final User user = userService.getCurrentlyAuthenticatedUser();
-    final List<Project> projects = getAllProjectsWithRatesAndTeamMembers(user.getId());
+    final var user = userService.getCurrentlyAuthenticatedUser();
+    final var projects = getAllProjectsWithRatesAndTeamMembers(user.getId());
 
     log.info("Get List<Project> by creatorId = {}: {}", user.getId(), projects);
 
@@ -113,8 +113,8 @@ public class ProjectService {
   @Transactional
   public ProjectDto updateProject(final CreateUpdateProjectDtoRequest request,
       final long projectId) {
-    final Project project = getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     checkIfUserOwnsProject(user, project);
 
@@ -139,8 +139,8 @@ public class ProjectService {
    */
   @Transactional
   public void deleteProject(final long projectId) {
-    final Project project = getProject(projectId);
-    final User user = userService.getCurrentlyAuthenticatedUser();
+    final var project = getProject(projectId);
+    final var user = userService.getCurrentlyAuthenticatedUser();
 
     checkIfUserOwnsProject(user, project);
 
@@ -176,8 +176,7 @@ public class ProjectService {
   }
 
   private List<Project> getAllProjectsWithRatesAndTeamMembers(final long creatorId) {
-    // an interesting way to avoid N+1 problem
-
+    // an interesting way to avoid N+1 problem:
     // https://vladmihalcea.com/hibernate-multiplebagfetchexception/
     // https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/
 

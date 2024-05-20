@@ -29,7 +29,7 @@ services:
         condition: service_healthy
 
   postgres:
-    container_name: postgres
+    container_name: project-calculator-postgres
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB}

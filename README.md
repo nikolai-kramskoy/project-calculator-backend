@@ -22,7 +22,24 @@ projects/milestones/features with estimates.
 
 This server is dependent only on single PostgreSQL instance.
 
+### Launch
+
+In the case you're having `.env` file you can simply run this command
+(otherwise you can use `-e` option with `docker compose` or some other method
+of supplying environment variables):
+
+```shell
+docker compose up
+```
+
+You can also use `mvn` directly to compile and package it without docker,
+but then you will need to provide PostgreSQL instance yourself.
+
 ### Environment variables
+
+You can create `.env` file in this directory and place there all the
+needed environment variables so docker compose will automatically read
+them and inject in the containers.
 
 You need to set these several environment variables:
 - `POSTGRES_HOST`
@@ -36,23 +53,7 @@ You may optionally set these environment variables:
 origins. Example: `CORS_ORIGINS="http://localhost:9000 https://example.com"`.
 - `JDK_JAVA_OPTIONS` - example: `JDK_JAVA_OPTIONS="-ea -Ddebug"`.
 - `CLI_ARGS` - example: 
-`CLI_ARGS="--logging.level.org.hibernate.SQL=DEBUG --logging.level.org.hibernate.stat=DEBUG"`. 
-
-You can create `.env` file in this directory and place there all the 
-needed environment variables so docker compose will automatically read
-them and inject in the containers.
-
-### Launch
-
-In the case you're having `.env` file you can simply run this command 
-(otherwise you also can use `-e` option with `docker compose`):
-
-```shell
-docker compose up
-```
-
-You can also use `mvn` directly to compile and package it without docker,
-but then you will need to provide PostgreSQL instance yourself.
+`CLI_ARGS="--logging.level.org.hibernate.SQL=DEBUG --logging.level.org.hibernate.stat=DEBUG"`.
 
 ### CLI arguments
 
@@ -63,3 +64,9 @@ in the queries and query statistics (by default they are not shown)):
 - `logging.level.org.hibernate.stat=DEBUG`
 - `logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE`
 - `spring.jpa.properties.hibernate.generate_statistics=true`
+
+## Possible improvements
+
+- Implement pagination for `HTTP GET` for projects/milestones/features
+- Think more about isolation levels for `@Transactional`, maybe in some
+methods non-default isolation levels will be more appropriate 

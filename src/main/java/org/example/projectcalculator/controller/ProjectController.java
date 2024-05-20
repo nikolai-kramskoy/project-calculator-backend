@@ -38,7 +38,7 @@ public class ProjectController {
   @ApiResponse(responseCode = "200", description = "Successful creation")
   public ResponseEntity<ProjectDto> createProject(
       @Valid @RequestBody final CreateUpdateProjectDtoRequest request) {
-    return ResponseEntity.ok(projectService.saveProject(request));
+    return ResponseEntity.ok(projectService.createProject(request));
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

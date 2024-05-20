@@ -37,7 +37,7 @@ public class MilestoneService {
   private final MilestoneMapper milestoneMapper;
 
   /**
-   * Saves {@link Milestone} in {@link MilestoneRepository}.
+   * Creates {@link Milestone} and saves it in {@link MilestoneRepository}.
    *
    * @param request   must be not {@code null}; it's {@code title}, {@code description} must be not
    *                  blank (null or size == 0); if {@code startDateTime} (same applies to
@@ -51,7 +51,7 @@ public class MilestoneService {
    *                                    found in {@link ProjectRepository}
    */
   @Transactional
-  public MilestoneDto saveMilestone(
+  public MilestoneDto createMilestone(
       final CreateUpdateMilestoneDtoRequest request, final long projectId) {
     final var project = projectService.getProject(projectId);
     final var user = userService.getCurrentlyAuthenticatedUser();
@@ -100,7 +100,7 @@ public class MilestoneService {
    * Updates {@link Milestone} in {@link MilestoneRepository} with data from {@code request}.
    *
    * @param request     same requirements as in
-   *                    {@link #saveMilestone(CreateUpdateMilestoneDtoRequest, long)}
+   *                    {@link #createMilestone(CreateUpdateMilestoneDtoRequest, long)}
    * @param projectId   must be {@code > 0}
    * @param milestoneId must be {@code > 0}
    * @return {@link MilestoneDto}

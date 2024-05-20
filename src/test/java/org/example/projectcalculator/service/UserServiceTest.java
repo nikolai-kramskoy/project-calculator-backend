@@ -47,14 +47,14 @@ class UserServiceTest {
 
     when(passwordEncoderMock.encode(userPassword)).thenReturn(user.getPasswordHash());
 
-    final var actualUserDto = userService.saveUser(createUserDtoRequest);
+    final var actualUserDto = userService.createUser(createUserDtoRequest);
 
     assertUsersAreEqual(expectedUserDto, actualUserDto);
   }
 
   @Test
   void testCreateUser_loginAlreadyExists_throwException() {
-    var user = new User(0L, "someUser", null, "blah@example.com", null, null);
+    var user = createUser();
     final var userPassword = "qwerty123";
     final var createUserDtoRequest = USER_MAPPER.toCreateUserDtoRequest(user, userPassword);
 
@@ -62,7 +62,7 @@ class UserServiceTest {
 
     final var projectCalculatorException =
         Assertions.assertThrows(
-            ProjectCalculatorException.class, () -> userService.saveUser(createUserDtoRequest));
+            ProjectCalculatorException.class, () -> userService.createUser(createUserDtoRequest));
 
     Assertions.assertEquals(
         ProjectCalculatorError.LOGIN_ALREADY_EXISTS,

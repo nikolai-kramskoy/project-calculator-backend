@@ -37,7 +37,7 @@ public class TeamMemberService {
   private final TeamMemberMapper teamMemberMapper;
 
   /**
-   * Saves {@link TeamMember} in {@link TeamMemberRepository}.
+   * Creates {@link TeamMember} and saves it in {@link TeamMemberRepository}.
    *
    * @param request   must be not {@code null}; {@code position} must be not blank (null or size ==
    *                  0); {@code numberOfTeamMembers} must be {@code > 0}
@@ -49,7 +49,7 @@ public class TeamMemberService {
    *                                    {@link Position} with such name does not exist
    */
   @Transactional
-  public TeamMemberDto saveTeamMember(final CreateUpdateTeamMemberDtoRequest request,
+  public TeamMemberDto createTeamMember(final CreateUpdateTeamMemberDtoRequest request,
       final long projectId) {
     checkIfStringIsValidPosition(request.position());
 
@@ -62,13 +62,14 @@ public class TeamMemberService {
 
     checkIfTeamMemberAlreadyExists(teamMembers, request.position());
 
-    final var teamMember = teamMemberRepository.save(teamMemberMapper.toTeam(request, project));
+    final var teamMember = teamMemberRepository.save(
+        teamMemberMapper.toTeamMember(request, project));
 
     project.setLastUpdatedAt(LocalDateTime.now(clock));
 
     log.info("Created {}", teamMember);
 
-    return teamMemberMapper.toTeamDto(teamMember);
+    return teamMemberMapper.toTeamMemberDto(teamMember);
   }
 
   /**
@@ -91,7 +92,7 @@ public class TeamMemberService {
     log.info("Get List<TeamMember> by projectId = {}: {}", projectId, teamMembers);
 
     return teamMembers.stream()
-        .map(teamMemberMapper::toTeamDto)
+        .map(teamMemberMapper::toTeamMemberDto)
         .toList();
   }
 
@@ -99,7 +100,7 @@ public class TeamMemberService {
    * Updates {@link TeamMember} in {@link TeamMemberRepository}.
    *
    * @param request      same requirements as in
-   *                     {@link #saveTeamMember(CreateUpdateTeamMemberDtoRequest, long)}
+   *                     {@link #createTeamMember(CreateUpdateTeamMemberDtoRequest, long)}
    * @param projectId    must be {@code > 0}
    * @param teamMemberId must be {@code > 0}
    * @return {@link TeamMemberDto}
@@ -135,7 +136,7 @@ public class TeamMemberService {
 
     log.info("Updated {}", teamMember);
 
-    return teamMemberMapper.toTeamDto(teamMember);
+    return teamMemberMapper.toTeamMemberDto(teamMember);
   }
 
   /**

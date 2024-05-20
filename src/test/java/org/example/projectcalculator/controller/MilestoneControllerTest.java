@@ -55,7 +55,8 @@ class MilestoneControllerTest {
         milestone);
     final var expectedMilestoneDto = MILESTONE_MAPPER.toMilestoneDto(milestone);
 
-    when(milestoneServiceMock.saveMilestone(createMilestoneDtoRequest, project.getId())).thenReturn(
+    when(milestoneServiceMock.createMilestone(createMilestoneDtoRequest,
+        project.getId())).thenReturn(
         expectedMilestoneDto);
 
     final var mvcResult =

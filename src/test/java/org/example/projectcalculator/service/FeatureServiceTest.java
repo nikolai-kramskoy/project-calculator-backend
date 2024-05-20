@@ -55,7 +55,7 @@ class FeatureServiceTest {
   }
 
   @Test
-  void testCreateFeatureWithMilestone_validFeature_returnCreatedFeature() {
+  void testCreateFeature_validFeatureWithMilestone_returnCreatedFeature() {
     final var creator = createUser();
     final var project = createProject(creator);
     final var milestone = createMilestone1(project);
@@ -63,6 +63,7 @@ class FeatureServiceTest {
     final var createFeatureDtoRequest = FEATURE_MAPPER.toCreateFeatureDtoRequest(feature);
     final var expectedFeatureDto = FEATURE_MAPPER.toFeatureDto(feature);
 
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
     when(projectServiceMock.getProject(project.getId())).thenReturn(project);
     when(milestoneServiceMock.getMilestone(project.getId(), milestone.getId())).thenReturn(
         milestone);
@@ -78,13 +79,14 @@ class FeatureServiceTest {
   }
 
   @Test
-  void testCreateFeatureWithoutMilestone_validFeature_returnCreatedFeature() {
+  void testCreateFeature_validFeatureWithoutMilestone_returnCreatedFeature() {
     final var creator = createUser();
     final var project = createProject(creator);
     final var feature = createFeature1(project, null);
     final var createFeatureDtoRequest = FEATURE_MAPPER.toCreateFeatureDtoRequest(feature);
     final var expectedFeatureDto = FEATURE_MAPPER.toFeatureDto(feature);
 
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
     when(projectServiceMock.getProject(project.getId())).thenReturn(project);
 
     when(featureRepositoryMock.save(any(Feature.class))).thenReturn(feature);
@@ -107,6 +109,9 @@ class FeatureServiceTest {
     final var updateFeatureDtoRequest = FEATURE_MAPPER.toUpdateFeatureDtoRequest(newFeature, null);
     final var expectedFeatureDto = FEATURE_MAPPER.toFeatureDto(newFeature);
 
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
+
     when(featureRepositoryMock.findByIdAndProjectId(feature.getId(), project.getId())).thenReturn(
         Optional.of(feature));
 
@@ -119,7 +124,7 @@ class FeatureServiceTest {
   }
 
   @Test
-  void testUpdateFeatureUpdateMilestone_validFeature_returnUpdatedFeature() {
+  void testUpdateFeature_validFeatureUpdateMilestone_returnUpdatedFeature() {
     final var creator = createUser();
     final var project = createProject(creator);
     final var oldMilestone = createMilestone1(project);
@@ -131,8 +136,11 @@ class FeatureServiceTest {
         newMilestone.getId());
     final var expectedFeatureDto = FEATURE_MAPPER.toFeatureDto(newFeature);
 
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
     when(milestoneServiceMock.getMilestone(project.getId(), newMilestone.getId())).thenReturn(
         newMilestone);
+
     when(featureRepositoryMock.findByIdAndProjectId(feature.getId(), project.getId())).thenReturn(
         Optional.of(feature));
 
@@ -145,7 +153,7 @@ class FeatureServiceTest {
   }
 
   @Test
-  void testUpdateFeatureSetMilestoneToNull_validFeature_returnUpdatedFeature() {
+  void testUpdateFeature_validFeatureSetMilestoneToNull_returnUpdatedFeature() {
     final var creator = createUser();
     final var project = createProject(creator);
     final var milestone = createMilestone1(project);
@@ -156,6 +164,8 @@ class FeatureServiceTest {
         milestone.getId());
     final var expectedFeatureDto = FEATURE_MAPPER.toFeatureDto(newFeature);
 
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
     when(featureRepositoryMock.findByIdAndProjectId(feature.getId(), project.getId())).thenReturn(
         Optional.of(feature));
 
@@ -168,16 +178,17 @@ class FeatureServiceTest {
   }
 
   @Test
-  void testGetAllFeaturesWithMilestone_validArguments_returnList() {
+  void testGetAllFeatures_validArgumentsWithMilestone_returnList() {
     final var creator = createUser();
     final var project = createProject(creator);
     final var milestone = createMilestone1(project);
-    final var feature1 = createFeature1(project, milestone);
-    final var feature2 = createFeature2(project, null);
-    final var features = List.of(feature1, feature2);
+    final var feature = createFeature1(project, milestone);
+
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
 
     when(featureRepositoryMock.findAllByProjectIdAndMilestoneId(project.getId(),
-        milestone.getId())).thenReturn(Collections.singletonList(features.get(0)));
+        milestone.getId())).thenReturn(Collections.singletonList(feature));
 
     setSecurityContext(creator);
 
@@ -185,15 +196,19 @@ class FeatureServiceTest {
 
     Assertions.assertNotNull(actualFeatureDtos);
     Assertions.assertEquals(1, actualFeatureDtos.size());
+    Assertions.assertEquals(feature.getId(), actualFeatureDtos.get(0).id());
   }
 
   @Test
-  void testGetAllFeaturesWithoutMilestone_validArguments_returnList() {
+  void testGetAllFeatures_validArgumentsWithoutMilestone_returnList() {
     final var creator = createUser();
     final var project = createProject(creator);
     final var feature1 = createFeature1(project, null);
     final var feature2 = createFeature2(project, null);
     final var features = List.of(feature1, feature2);
+
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
+    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
 
     when(featureRepositoryMock.findAllByProjectId(project.getId())).thenReturn(features);
 

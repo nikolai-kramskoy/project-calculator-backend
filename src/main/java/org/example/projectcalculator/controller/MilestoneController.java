@@ -39,7 +39,7 @@ public class MilestoneController {
   public ResponseEntity<MilestoneDto> createMilestone(
       @Valid @RequestBody final CreateUpdateMilestoneDtoRequest request,
       @PathVariable("projectId") @Min(1) long projectId) {
-    return ResponseEntity.ok(milestoneService.saveMilestone(request, projectId));
+    return ResponseEntity.ok(milestoneService.createMilestone(request, projectId));
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

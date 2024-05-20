@@ -44,7 +44,7 @@ class ProjectControllerTest {
     final var createProjectDtoRequest = PROJECT_MAPPER.toCreateProjectDtoRequest(project);
     final var expectedProjectDto = PROJECT_MAPPER.toProjectDto(project);
 
-    when(projectServiceMock.saveProject(createProjectDtoRequest)).thenReturn(expectedProjectDto);
+    when(projectServiceMock.createProject(createProjectDtoRequest)).thenReturn(expectedProjectDto);
 
     final var mvcResult =
         mockMvc

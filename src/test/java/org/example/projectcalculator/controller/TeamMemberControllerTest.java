@@ -49,9 +49,9 @@ class TeamMemberControllerTest {
     final var teamMember = createTeamMember(project);
     final var createTeamMemberDtoRequest = TEAM_MEMBER_MAPPER.toCreateUpdateTeamMemberDtoRequest(
         teamMember);
-    final var expectedTeamMemberDto = TEAM_MEMBER_MAPPER.toTeamDto(teamMember);
+    final var expectedTeamMemberDto = TEAM_MEMBER_MAPPER.toTeamMemberDto(teamMember);
 
-    when(teamMemberServiceMock.saveTeamMember(createTeamMemberDtoRequest,
+    when(teamMemberServiceMock.createTeamMember(createTeamMemberDtoRequest,
         project.getId())).thenReturn(expectedTeamMemberDto);
 
     final var mvcResult =
@@ -82,7 +82,7 @@ class TeamMemberControllerTest {
     final var teamMember = createTeamMember(project);
     final var updateTeamMemberDtoRequest = TEAM_MEMBER_MAPPER.toCreateUpdateTeamMemberDtoRequest(
         teamMember);
-    final var expectedTeamMemberDto = TEAM_MEMBER_MAPPER.toTeamDto(teamMember);
+    final var expectedTeamMemberDto = TEAM_MEMBER_MAPPER.toTeamMemberDto(teamMember);
 
     when(teamMemberServiceMock.updateTeamMember(updateTeamMemberDtoRequest, project.getId(),
         teamMember.getId())).thenReturn(expectedTeamMemberDto);
@@ -114,7 +114,7 @@ class TeamMemberControllerTest {
     final var project = createProject(creator);
     final var expectedTeamMemberDtos =
         List.of(
-            TEAM_MEMBER_MAPPER.toTeamDto(createTeamMember(project)));
+            TEAM_MEMBER_MAPPER.toTeamMemberDto(createTeamMember(project)));
 
     when(teamMemberServiceMock.getAllTeamMembers(project.getId())).thenReturn(
         expectedTeamMemberDtos);

@@ -67,6 +67,11 @@ in the queries and query statistics (by default they are not shown)):
 
 ## Possible improvements
 
-- Implement pagination for `HTTP GET` for projects/milestones/features
+- Implement pagination for `GET` for projects/milestones/features
 - Think more about isolation levels for `@Transactional`, maybe in some
 methods non-default isolation levels will be more appropriate 
+- Introduce roles for users (e.g. admin, user)
+- Introduce some missing API endpoints (like `DELETE /users/{userId}`)
+- Improve OpenAPI docs (like describing that at project's creation other
+related entities are created)
+- Make more unit-tests to cover more lines of code and branches

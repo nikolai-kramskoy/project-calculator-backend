@@ -35,7 +35,7 @@ public class UserService {
   private final UserMapper userMapper;
 
   /**
-   * Saves {@link User} in {@link UserRepository}.
+   * Creates {@link User} and saves it in {@link UserRepository}.
    *
    * @param request must be not {@code null}; it's {@code login}, {@code password} and {@code email}
    *                must be not blank (null or size == 0)
@@ -44,7 +44,7 @@ public class UserService {
    *                                    in {@link UserRepository}
    */
   @Transactional
-  public UserDto saveUser(final CreateUserDtoRequest request) {
+  public UserDto createUser(final CreateUserDtoRequest request) {
     if (userRepository.findByLogin(request.login()).isPresent()) {
       throw new ProjectCalculatorException(ProjectCalculatorError.LOGIN_ALREADY_EXISTS, "login");
     }

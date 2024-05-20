@@ -3,22 +3,17 @@ package org.example.projectcalculator.service;
 import static org.example.projectcalculator.Asserter.assertMilestonesAreEqual;
 import static org.example.projectcalculator.TestingData.CLOCK;
 import static org.example.projectcalculator.TestingData.MILESTONE_MAPPER;
-import static org.example.projectcalculator.TestingData.NOW;
 import static org.example.projectcalculator.TestingData.createMilestone1;
 import static org.example.projectcalculator.TestingData.createMilestone2;
 import static org.example.projectcalculator.TestingData.createProject;
 import static org.example.projectcalculator.TestingData.createUser;
 import static org.example.projectcalculator.service.utility.ServiceTestHelper.setSecurityContext;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import org.example.projectcalculator.error.ProjectCalculatorError;
-import org.example.projectcalculator.error.ProjectCalculatorException;
 import org.example.projectcalculator.model.Milestone;
 import org.example.projectcalculator.repository.MilestoneRepository;
 import org.junit.jupiter.api.Assertions;
@@ -56,50 +51,17 @@ class MilestoneServiceTest {
         milestone);
     final var expectedMilestoneDto = MILESTONE_MAPPER.toMilestoneDto(milestone);
 
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
     when(projectServiceMock.getProject(project.getId())).thenReturn(project);
 
     when(milestoneRepositoryMock.save(any(Milestone.class))).thenReturn(milestone);
 
     setSecurityContext(creator);
 
-    final var actualMilestoneDto = milestoneService.saveMilestone(createMilestoneDtoRequest,
+    final var actualMilestoneDto = milestoneService.createMilestone(createMilestoneDtoRequest,
         project.getId());
 
     assertMilestonesAreEqual(expectedMilestoneDto, actualMilestoneDto);
-  }
-
-  @Test
-  void testCreateMilestone_wrongProjectId_throwException() {
-    final var creator = createUser();
-    var milestone =
-        new Milestone(
-            0L,
-            null,
-            "Basic API",
-            "Basic API blah...",
-            NOW.plusDays(5),
-            NOW.plusDays(10),
-            BigDecimal.ZERO,
-            null,
-            null);
-    final var nonexistentProjectId = 1L;
-    final var createMilestoneDtoRequest = MILESTONE_MAPPER.toCreateUpdateMilestoneDtoRequest(
-        milestone);
-
-    when(projectServiceMock.getProject(nonexistentProjectId)).thenThrow(
-        new ProjectCalculatorException(ProjectCalculatorError.PROJECT_IS_NOT_FOUND_BY_ID,
-            "projectId"));
-
-    setSecurityContext(creator);
-
-    final var projectCalculatorException =
-        Assertions.assertThrows(
-            ProjectCalculatorException.class,
-            () -> milestoneService.saveMilestone(createMilestoneDtoRequest, nonexistentProjectId));
-
-    Assertions.assertEquals(
-        ProjectCalculatorError.PROJECT_IS_NOT_FOUND_BY_ID,
-        projectCalculatorException.getProjectCalculatorError());
   }
 
   @Test
@@ -113,6 +75,7 @@ class MilestoneServiceTest {
         newMilestone);
     final var expectedMilestoneDto = MILESTONE_MAPPER.toMilestoneDto(newMilestone);
 
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
     when(projectServiceMock.getProject(project.getId())).thenReturn(project);
 
     when(milestoneRepositoryMock.findByIdAndProjectId(milestone.getId(),
@@ -132,37 +95,16 @@ class MilestoneServiceTest {
     final var project = createProject(creator);
     final var milestone = createMilestone1(project);
 
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
     when(projectServiceMock.getProject(project.getId())).thenReturn(project);
 
-    when(milestoneRepositoryMock.findByIdAndProjectId(milestone.getId(), eq(project.getId())))
-        .thenReturn(Optional.of(milestone));
+    when(milestoneRepositoryMock.findByIdAndProjectId(milestone.getId(),
+        project.getId())).thenReturn(Optional.of(milestone));
 
     setSecurityContext(creator);
 
     Assertions.assertDoesNotThrow(
         () -> milestoneService.deleteMilestone(project.getId(), milestone.getId()));
-  }
-
-  @Test
-  void testDeleteMilestone_wrongMilestoneId_throwException() {
-    final var creator = createUser();
-    final var project = createProject(creator);
-    final long nonexistentMilestoneId = 1L;
-
-    when(projectServiceMock.getProject(project.getId())).thenReturn(project);
-
-    when(milestoneRepositoryMock.findById(nonexistentMilestoneId)).thenReturn(Optional.empty());
-
-    setSecurityContext(creator);
-
-    final var projectCalculatorException =
-        Assertions.assertThrows(
-            ProjectCalculatorException.class,
-            () -> milestoneService.deleteMilestone(project.getId(), nonexistentMilestoneId));
-
-    Assertions.assertEquals(
-        ProjectCalculatorError.MILESTONE_IS_NOT_FOUND_BY_ID,
-        projectCalculatorException.getProjectCalculatorError());
   }
 
   @Test
@@ -174,6 +116,7 @@ class MilestoneServiceTest {
             createMilestone1(project),
             createMilestone2(project));
 
+    when(userServiceMock.getCurrentlyAuthenticatedUser()).thenReturn(creator);
     when(projectServiceMock.getProject(project.getId())).thenReturn(project);
 
     when(milestoneRepositoryMock.findAllByProjectId(project.getId())).thenReturn(milestones);

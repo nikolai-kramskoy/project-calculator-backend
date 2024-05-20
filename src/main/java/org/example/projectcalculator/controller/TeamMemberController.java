@@ -39,7 +39,7 @@ public class TeamMemberController {
   public ResponseEntity<TeamMemberDto> createTeamMember(
       @PathVariable("projectId") @Min(1) final long projectId,
       @Valid @RequestBody final CreateUpdateTeamMemberDtoRequest request) {
-    return ResponseEntity.ok(teamMemberService.saveTeamMember(request, projectId));
+    return ResponseEntity.ok(teamMemberService.createTeamMember(request, projectId));
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

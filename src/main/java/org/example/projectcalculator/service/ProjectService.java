@@ -43,14 +43,14 @@ public class ProjectService {
   private final ProjectMapper projectMapper;
 
   /**
-   * Saves {@link Project} in {@link ProjectRepository}.
+   * Creates {@link Project} and saves it in {@link ProjectRepository}.
    *
    * @param request must be not {@code null}; it's {@code title}, {@code description} and
    *                {@code client} must be not blank (null or size == 0)
    * @return {@link ProjectDto}
    */
   @Transactional
-  public ProjectDto saveProject(final CreateUpdateProjectDtoRequest request) {
+  public ProjectDto createProject(final CreateUpdateProjectDtoRequest request) {
     final var creator = userService.getCurrentlyAuthenticatedUser();
     final var now = LocalDateTime.now(clock);
 
@@ -104,7 +104,7 @@ public class ProjectService {
   /**
    * Updates {@link Project} in {@link ProjectRepository} with data from {@code request}.
    *
-   * @param request   same requirements as in {@link #saveProject(CreateUpdateProjectDtoRequest)}
+   * @param request   same requirements as in {@link #createProject(CreateUpdateProjectDtoRequest)}
    * @param projectId must be {@code > 0}
    * @return {@link ProjectDto}
    * @throws ProjectCalculatorException if {@link Project} with specified {@code projectId} is not

@@ -76,7 +76,7 @@ class AuthenticationTest {
     final var expectedProjectDto = PROJECT_MAPPER.toProjectDto(project);
 
     when(userRepositoryMock.findByLogin(creator.getLogin())).thenReturn(Optional.of(creator));
-    when(projectServiceMock.saveProject(createProjectDtoRequest)).thenReturn(expectedProjectDto);
+    when(projectServiceMock.createProject(createProjectDtoRequest)).thenReturn(expectedProjectDto);
 
     mockMvc
         .perform(
@@ -110,7 +110,7 @@ class AuthenticationTest {
     final var createUserDtoRequest = USER_MAPPER.toCreateUserDtoRequest(user, "qwerty123");
     final var expectedUserDto = USER_MAPPER.toUserDto(user);
 
-    when(userServiceMock.saveUser(createUserDtoRequest)).thenReturn(expectedUserDto);
+    when(userServiceMock.createUser(createUserDtoRequest)).thenReturn(expectedUserDto);
 
     mockMvc
         .perform(

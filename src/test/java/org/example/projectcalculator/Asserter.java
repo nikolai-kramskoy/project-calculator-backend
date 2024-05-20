@@ -31,58 +31,60 @@ public class Asserter {
   }
 
   public static void assertUsersAreEqual(
-      final UserDto expectedUser, final UserDto actualUser) {
-    Assertions.assertEquals(expectedUser.id(), actualUser.id());
-    Assertions.assertEquals(expectedUser.login(), actualUser.login());
-    Assertions.assertEquals(expectedUser.email(), actualUser.email());
+      final UserDto expectedUserDto, final UserDto actualUserDto) {
+    Assertions.assertEquals(expectedUserDto.id(), actualUserDto.id());
+    Assertions.assertEquals(expectedUserDto.login(), actualUserDto.login());
+    Assertions.assertEquals(expectedUserDto.email(), actualUserDto.email());
   }
 
   public static void assertProjectsAreEqual(
-      final ProjectDto expectedProject, final ProjectDto actualProject) {
-    Assertions.assertEquals(expectedProject.id(), actualProject.id());
-    Assertions.assertEquals(expectedProject.title(), actualProject.title());
-    Assertions.assertEquals(expectedProject.description(), actualProject.description());
-    Assertions.assertEquals(expectedProject.client(), actualProject.client());
-    Assertions.assertEquals(expectedProject.creatorId(), actualProject.creatorId());
-    Assertions.assertEquals(expectedProject.estimateInDays(), actualProject.estimateInDays());
-    Assertions.assertEquals(expectedProject.priceInRubles(), actualProject.priceInRubles());
+      final ProjectDto expectedProjectDto, final ProjectDto actualProjectDto) {
+    Assertions.assertEquals(expectedProjectDto.id(), actualProjectDto.id());
+    Assertions.assertEquals(expectedProjectDto.title(), actualProjectDto.title());
+    Assertions.assertEquals(expectedProjectDto.description(), actualProjectDto.description());
+    Assertions.assertEquals(expectedProjectDto.client(), actualProjectDto.client());
+    Assertions.assertEquals(expectedProjectDto.creatorId(), actualProjectDto.creatorId());
+    Assertions.assertEquals(expectedProjectDto.estimateInDays(), actualProjectDto.estimateInDays());
+    Assertions.assertEquals(expectedProjectDto.priceInRubles(), actualProjectDto.priceInRubles());
   }
 
   public static void assertMilestonesAreEqual(
-      final MilestoneDto expectedMilestone, final MilestoneDto actualMilestone) {
-    Assertions.assertEquals(expectedMilestone.id(), actualMilestone.id());
-    Assertions.assertEquals(expectedMilestone.projectId(), actualMilestone.projectId());
-    Assertions.assertEquals(expectedMilestone.title(), actualMilestone.title());
-    Assertions.assertEquals(expectedMilestone.description(), actualMilestone.description());
-    Assertions.assertEquals(expectedMilestone.startDateTime(), actualMilestone.startDateTime());
-    Assertions.assertEquals(expectedMilestone.endDateTime(), actualMilestone.endDateTime());
-    Assertions.assertEquals(expectedMilestone.estimateInDays(), actualMilestone.estimateInDays());
-    Assertions.assertEquals(expectedMilestone.priceInRubles(), actualMilestone.priceInRubles());
+      final MilestoneDto expectedMilestoneDto, final MilestoneDto actualMilestoneDto) {
+    Assertions.assertEquals(expectedMilestoneDto.id(), actualMilestoneDto.id());
+    Assertions.assertEquals(expectedMilestoneDto.projectId(), actualMilestoneDto.projectId());
+    Assertions.assertEquals(expectedMilestoneDto.title(), actualMilestoneDto.title());
+    Assertions.assertEquals(expectedMilestoneDto.description(), actualMilestoneDto.description());
+    Assertions.assertEquals(expectedMilestoneDto.startDateTime(),
+        actualMilestoneDto.startDateTime());
+    Assertions.assertEquals(expectedMilestoneDto.endDateTime(), actualMilestoneDto.endDateTime());
+    Assertions.assertEquals(expectedMilestoneDto.estimateInDays(),
+        actualMilestoneDto.estimateInDays());
+    Assertions.assertEquals(expectedMilestoneDto.priceInRubles(),
+        actualMilestoneDto.priceInRubles());
   }
 
   public static void assertFeaturesAreEqual(
-      final FeatureDto expectedFeature, final FeatureDto actualFeature) {
-    Assertions.assertEquals(expectedFeature.id(), actualFeature.id());
-    Assertions.assertEquals(expectedFeature.projectId(), actualFeature.projectId());
-    Assertions.assertEquals(expectedFeature.milestoneId(), actualFeature.milestoneId());
-    Assertions.assertEquals(expectedFeature.title(), actualFeature.title());
-    Assertions.assertEquals(expectedFeature.description(), actualFeature.description());
-    Assertions.assertEquals(expectedFeature.bestCaseEstimateInDays(),
-        actualFeature.bestCaseEstimateInDays());
-    Assertions.assertEquals(expectedFeature.mostLikelyEstimateInDays(),
-        actualFeature.mostLikelyEstimateInDays());
-    Assertions.assertEquals(expectedFeature.worstCaseEstimateInDays(),
-        actualFeature.worstCaseEstimateInDays());
-    Assertions.assertEquals(expectedFeature.estimateInDays(),
-        actualFeature.estimateInDays());
+      final FeatureDto expectedFeatureDto, final FeatureDto actualFeatureDto) {
+    Assertions.assertEquals(expectedFeatureDto.id(), actualFeatureDto.id());
+    Assertions.assertEquals(expectedFeatureDto.projectId(), actualFeatureDto.projectId());
+    Assertions.assertEquals(expectedFeatureDto.milestoneId(), actualFeatureDto.milestoneId());
+    Assertions.assertEquals(expectedFeatureDto.title(), actualFeatureDto.title());
+    Assertions.assertEquals(expectedFeatureDto.description(), actualFeatureDto.description());
+    Assertions.assertEquals(expectedFeatureDto.bestCaseEstimateInDays(),
+        actualFeatureDto.bestCaseEstimateInDays());
+    Assertions.assertEquals(expectedFeatureDto.mostLikelyEstimateInDays(),
+        actualFeatureDto.mostLikelyEstimateInDays());
+    Assertions.assertEquals(expectedFeatureDto.worstCaseEstimateInDays(),
+        actualFeatureDto.worstCaseEstimateInDays());
+    Assertions.assertEquals(expectedFeatureDto.estimateInDays(), actualFeatureDto.estimateInDays());
   }
 
-  public static void assertTeamMembersAreEqual(final TeamMemberDto expectedTeamMember,
-      final TeamMemberDto actualTeamMember) {
-    Assertions.assertEquals(expectedTeamMember.id(), actualTeamMember.id());
-    Assertions.assertEquals(expectedTeamMember.position(), actualTeamMember.position());
-    Assertions.assertEquals(expectedTeamMember.numberOfTeamMembers(),
-        actualTeamMember.numberOfTeamMembers());
+  public static void assertTeamMembersAreEqual(final TeamMemberDto expectedTeamMemberDto,
+      final TeamMemberDto actualTeamMemberDto) {
+    Assertions.assertEquals(expectedTeamMemberDto.id(), actualTeamMemberDto.id());
+    Assertions.assertEquals(expectedTeamMemberDto.position(), actualTeamMemberDto.position());
+    Assertions.assertEquals(expectedTeamMemberDto.numberOfTeamMembers(),
+        actualTeamMemberDto.numberOfTeamMembers());
   }
 
   public static void assertRatesAreEqual(final RateDto expectedRateDto,

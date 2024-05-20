@@ -16,9 +16,9 @@ public interface TeamMemberMapper {
   @Mapping(source = "request.position", target = "position")
   @Mapping(source = "request.numberOfTeamMembers", target = "numberOfTeamMembers")
   @Mapping(source = "project", target = "project")
-  TeamMember toTeam(CreateUpdateTeamMemberDtoRequest request, Project project);
+  TeamMember toTeamMember(CreateUpdateTeamMemberDtoRequest request, Project project);
 
-  TeamMemberDto toTeamDto(TeamMember teamMember);
+  TeamMemberDto toTeamMemberDto(TeamMember teamMember);
 
   CreateUpdateTeamMemberDtoRequest toCreateUpdateTeamMemberDtoRequest(TeamMember teamMember);
 }

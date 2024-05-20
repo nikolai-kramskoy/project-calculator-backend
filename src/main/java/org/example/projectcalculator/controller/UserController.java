@@ -37,7 +37,7 @@ public class UserController {
   @ApiResponse(responseCode = "200", description = "Successful creation")
   public ResponseEntity<UserDto> createUser(
       @Valid @RequestBody final CreateUserDtoRequest request) {
-    return ResponseEntity.ok(userService.saveUser(request));
+    return ResponseEntity.ok(userService.createUser(request));
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

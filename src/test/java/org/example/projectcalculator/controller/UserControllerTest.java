@@ -43,7 +43,7 @@ class UserControllerTest {
     final var createUserDtoRequest = USER_MAPPER.toCreateUserDtoRequest(user, "qwerty123");
     final var expectedUserDto = USER_MAPPER.toUserDto(user);
 
-    when(userServiceMock.saveUser(createUserDtoRequest)).thenReturn(expectedUserDto);
+    when(userServiceMock.createUser(createUserDtoRequest)).thenReturn(expectedUserDto);
 
     final var mvcResult =
         mockMvc

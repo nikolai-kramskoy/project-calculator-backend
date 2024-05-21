@@ -75,3 +75,5 @@ methods non-default isolation levels will be more appropriate
 - Improve OpenAPI docs (like describing that at project's creation other
 related entities are created)
 - Make more unit-tests to cover more lines of code and branches
+- Add volumes and secrets to Docker setup
+
